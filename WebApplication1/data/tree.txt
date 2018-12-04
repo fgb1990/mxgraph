@@ -1,0 +1,1 @@
+[{id: 'base', text: '基础数据管理', checked: true},{id: 'Config/Index', text: '基础数据类型维护', pid: 'base'},{id: 'Config/BaseDataManage', text: '基础数据维护', pid: 'base'}]

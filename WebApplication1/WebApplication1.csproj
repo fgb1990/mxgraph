@@ -1,0 +1,468 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{FC08DAEA-FB5C-4FDA-B39A-CA6E1B99B5CB}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>WebApplication1</RootNamespace>
+    <AssemblyName>WebApplication1</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\icons\add.gif" />
+    <Content Include="Content\icons\addfolder.gif" />
+    <Content Include="Content\icons\addnew.gif" />
+    <Content Include="Content\icons\cancel.gif" />
+    <Content Include="Content\icons\collapse.gif" />
+    <Content Include="Content\icons\cut.png" />
+    <Content Include="Content\icons\date.gif" />
+    <Content Include="Content\icons\downgrade.gif" />
+    <Content Include="Content\icons\download.gif" />
+    <Content Include="Content\icons\edit.gif" />
+    <Content Include="Content\icons\expand.gif" />
+    <Content Include="Content\icons\filter.gif" />
+    <Content Include="Content\icons\find.png" />
+    <Content Include="Content\icons\folder-open.gif" />
+    <Content Include="Content\icons\folder.gif" />
+    <Content Include="Content\icons\goto.gif" />
+    <Content Include="Content\icons\help.gif" />
+    <Content Include="Content\icons\help.png" />
+    <Content Include="Content\icons\lock.png" />
+    <Content Include="Content\icons\new.gif" />
+    <Content Include="Content\icons\no.png" />
+    <Content Include="Content\icons\node.png" />
+    <Content Include="Content\icons\noimage.gif" />
+    <Content Include="Content\icons\nowait.gif" />
+    <Content Include="Content\icons\ok.png" />
+    <Content Include="Content\icons\open.gif" />
+    <Content Include="Content\icons\print.gif" />
+    <Content Include="Content\icons\redo.gif" />
+    <Content Include="Content\icons\reload.png" />
+    <Content Include="Content\icons\remove.gif" />
+    <Content Include="Content\icons\save.gif" />
+    <Content Include="Content\icons\search.gif" />
+    <Content Include="Content\icons\sort.gif" />
+    <Content Include="Content\icons\split.gif" />
+    <Content Include="Content\icons\tip.png" />
+    <Content Include="Content\icons\undo.gif" />
+    <Content Include="Content\icons\unlock.gif" />
+    <Content Include="Content\icons\upgrade.gif" />
+    <Content Include="Content\icons\upload.gif" />
+    <Content Include="Content\icons\user.png" />
+    <Content Include="Content\icons\wait.gif" />
+    <Content Include="Content\icons\warning.png" />
+    <Content Include="Content\icons\zoomin.gif" />
+    <Content Include="Content\icons\zoomout.gif" />
+    <Content Include="Content\icons\_help.png" />
+    <Content Include="Content\images\buttonedit\button.png" />
+    <Content Include="Content\images\buttonedit\close.gif" />
+    <Content Include="Content\images\buttonedit\date.gif" />
+    <Content Include="Content\images\buttonedit\down.gif" />
+    <Content Include="Content\images\buttonedit\error.gif" />
+    <Content Include="Content\images\buttonedit\filter.png" />
+    <Content Include="Content\images\buttonedit\hover.png" />
+    <Content Include="Content\images\buttonedit\icon1.gif" />
+    <Content Include="Content\images\buttonedit\icon2.gif" />
+    <Content Include="Content\images\buttonedit\pressed.png" />
+    <Content Include="Content\images\buttonedit\up.gif" />
+    <Content Include="Content\images\buttonedit\_icon3.gif" />
+    <Content Include="Content\images\button\button.png" />
+    <Content Include="Content\images\button\disabled.png" />
+    <Content Include="Content\images\button\hover.png" />
+    <Content Include="Content\images\button\icons.png" />
+    <Content Include="Content\images\button\menu_arrow.png" />
+    <Content Include="Content\images\button\pressed.png" />
+    <Content Include="Content\images\button\split-allow-bottom.gif" />
+    <Content Include="Content\images\button\split_arrow.png" />
+    <Content Include="Content\images\calendar\button.png" />
+    <Content Include="Content\images\calendar\header.png" />
+    <Content Include="Content\images\calendar\months.gif" />
+    <Content Include="Content\images\calendar\next.gif" />
+    <Content Include="Content\images\calendar\prev.gif" />
+    <Content Include="Content\images\datepicker\date.gif" />
+    <Content Include="Content\images\dragdrop\drop-add.gif" />
+    <Content Include="Content\images\dragdrop\drop-between.gif" />
+    <Content Include="Content\images\dragdrop\drop-no.gif" />
+    <Content Include="Content\images\dragdrop\drop-over.gif" />
+    <Content Include="Content\images\dragdrop\drop-under.gif" />
+    <Content Include="Content\images\dragdrop\drop-yes.gif" />
+    <Content Include="Content\images\gantt\arrow_blue_down.gif" />
+    <Content Include="Content\images\gantt\arrow_blue_left.gif" />
+    <Content Include="Content\images\gantt\arrow_blue_right.gif" />
+    <Content Include="Content\images\gantt\arrow_blue_up.gif" />
+    <Content Include="Content\images\gantt\arrow_red_down.gif" />
+    <Content Include="Content\images\gantt\arrow_red_left.gif" />
+    <Content Include="Content\images\gantt\arrow_red_right.gif" />
+    <Content Include="Content\images\gantt\arrow_red_up.gif" />
+    <Content Include="Content\images\gantt\baseline-milestone.gif" />
+    <Content Include="Content\images\gantt\collapse.gif" />
+    <Content Include="Content\images\gantt\constraint-finish.gif" />
+    <Content Include="Content\images\gantt\constraint-start.gif" />
+    <Content Include="Content\images\gantt\expand.gif" />
+    <Content Include="Content\images\gantt\finished.gif" />
+    <Content Include="Content\images\gantt\gvdp.gif" />
+    <Content Include="Content\images\gantt\header.gif" />
+    <Content Include="Content\images\gantt\header_bg.gif" />
+    <Content Include="Content\images\gantt\milestone-red.gif" />
+    <Content Include="Content\images\gantt\milestone.gif" />
+    <Content Include="Content\images\gantt\ms-task.gif" />
+    <Content Include="Content\images\gantt\notes.gif" />
+    <Content Include="Content\images\gantt\offday.gif" />
+    <Content Include="Content\images\gantt\summary-top.gif" />
+    <Content Include="Content\images\gantt\summary.gif" />
+    <Content Include="Content\images\gantt\summary2.gif" />
+    <Content Include="Content\images\gantt\taskbg.gif" />
+    <Content Include="Content\images\gantt\taskbg2.gif" />
+    <Content Include="Content\images\gantt\taskstatus.gif" />
+    <Content Include="Content\images\gantt\title_bg.png" />
+    <Content Include="Content\images\gantt\warning.png" />
+    <Content Include="Content\images\grid\col-move-bottom.gif" />
+    <Content Include="Content\images\grid\col-move-top.gif" />
+    <Content Include="Content\images\grid\collapse.gif" />
+    <Content Include="Content\images\grid\dirty.gif" />
+    <Content Include="Content\images\grid\expand.gif" />
+    <Content Include="Content\images\grid\footer.png" />
+    <Content Include="Content\images\grid\header.png" />
+    <Content Include="Content\images\grid\icons.png" />
+    <Content Include="Content\images\grid\loading.gif" />
+    <Content Include="Content\images\grid\no.gif" />
+    <Content Include="Content\images\grid\ok.gif" />
+    <Content Include="Content\images\grid\resize.gif" />
+    <Content Include="Content\images\grid\sorticon.gif" />
+    <Content Include="Content\images\grid\sort_asc.gif" />
+    <Content Include="Content\images\grid\sort_desc.gif" />
+    <Content Include="Content\images\header.gif" />
+    <Content Include="Content\images\icons\checkbox.gif" />
+    <Content Include="Content\images\icons\radio.gif" />
+    <Content Include="Content\images\layout\east.gif" />
+    <Content Include="Content\images\layout\header.png" />
+    <Content Include="Content\images\layout\north.gif" />
+    <Content Include="Content\images\layout\south.gif" />
+    <Content Include="Content\images\layout\west.gif" />
+    <Content Include="Content\images\listbox\error.gif" />
+    <Content Include="Content\images\listbox\header.png" />
+    <Content Include="Content\images\menu\arrow.png" />
+    <Content Include="Content\images\menu\bottom-arrow.gif" />
+    <Content Include="Content\images\menu\checked.gif" />
+    <Content Include="Content\images\menu\hallow.gif" />
+    <Content Include="Content\images\menu\hmenubg.png" />
+    <Content Include="Content\images\menu\item.png" />
+    <Content Include="Content\images\menu\menubg.gif" />
+    <Content Include="Content\images\menu\pressed.png" />
+    <Content Include="Content\images\menu\top-arrow.gif" />
+    <Content Include="Content\images\messagebox\icon-error.gif" />
+    <Content Include="Content\images\messagebox\icon-info.gif" />
+    <Content Include="Content\images\messagebox\icon-question.gif" />
+    <Content Include="Content\images\messagebox\icon-warning.gif" />
+    <Content Include="Content\images\messagebox\loading.gif" />
+    <Content Include="Content\images\mygantt\header.png" />
+    <Content Include="Content\images\navbar\header.png" />
+    <Content Include="Content\images\pager\first.gif" />
+    <Content Include="Content\images\pager\last.gif" />
+    <Content Include="Content\images\pager\next.gif" />
+    <Content Include="Content\images\pager\prev.gif" />
+    <Content Include="Content\images\pager\reload.png" />
+    <Content Include="Content\images\panel\header.png" />
+    <Content Include="Content\images\panel\resize.gif" />
+    <Content Include="Content\images\rgantt\bg.gif" />
+    <Content Include="Content\images\rgantt\cancel.gif" />
+    <Content Include="Content\images\rgantt\hdbg.gif" />
+    <Content Include="Content\images\rgantt\pc.gif" />
+    <Content Include="Content\images\rgantt\pc_03.gif" />
+    <Content Include="Content\images\splitter\buttons.gif" />
+    <Content Include="Content\images\splitter\mini-bottom.gif" />
+    <Content Include="Content\images\splitter\mini-left.gif" />
+    <Content Include="Content\images\splitter\mini-right.gif" />
+    <Content Include="Content\images\splitter\mini-top.gif" />
+    <Content Include="Content\images\splitter\resize.gif" />
+    <Content Include="Content\images\splitter\resize_h.gif" />
+    <Content Include="Content\images\supergrid\btn.gif" />
+    <Content Include="Content\images\supergrid\col-move-bottom.gif" />
+    <Content Include="Content\images\supergrid\col-move-top.gif" />
+    <Content Include="Content\images\supergrid\datagrid_header_bg.gif" />
+    <Content Include="Content\images\supergrid\datagrid_row_collapse.gif" />
+    <Content Include="Content\images\supergrid\datagrid_row_expand.gif" />
+    <Content Include="Content\images\supergrid\datagrid_sort_asc.gif" />
+    <Content Include="Content\images\supergrid\datagrid_sort_desc.gif" />
+    <Content Include="Content\images\supergrid\datagrid_title_bg.png" />
+    <Content Include="Content\images\supergrid\dirty.gif" />
+    <Content Include="Content\images\supergrid\header-hover.gif" />
+    <Content Include="Content\images\supergrid\header-pressed.gif" />
+    <Content Include="Content\images\supergrid\header.gif" />
+    <Content Include="Content\images\supergrid\invalid_line.gif" />
+    <Content Include="Content\images\supergrid\loading.gif" />
+    <Content Include="Content\images\supergrid\no.gif" />
+    <Content Include="Content\images\supergrid\ok.gif" />
+    <Content Include="Content\images\supergrid\rowselected.gif" />
+    <Content Include="Content\images\supergrid\row_collapse.gif" />
+    <Content Include="Content\images\supergrid\row_expand.gif" />
+    <Content Include="Content\images\supergrid\sort_asc.gif" />
+    <Content Include="Content\images\supergrid\sort_desc.gif" />
+    <Content Include="Content\images\supergrid\title_bg.png" />
+    <Content Include="Content\images\supergrid\tree\arrows.gif" />
+    <Content Include="Content\images\supergrid\tree\button.png" />
+    <Content Include="Content\images\supergrid\tree\collapse.gif" />
+    <Content Include="Content\images\supergrid\tree\collapseLine - 副本.gif" />
+    <Content Include="Content\images\supergrid\tree\collapseLine.gif" />
+    <Content Include="Content\images\supergrid\tree\expand.gif" />
+    <Content Include="Content\images\supergrid\tree\expandLine.gif" />
+    <Content Include="Content\images\supergrid\tree\file.png" />
+    <Content Include="Content\images\supergrid\tree\firstAndlastcollapse.gif" />
+    <Content Include="Content\images\supergrid\tree\firstAndlastexpand.gif" />
+    <Content Include="Content\images\supergrid\tree\firstCollapseNode.gif" />
+    <Content Include="Content\images\supergrid\tree\firstExpandNode.gif" />
+    <Content Include="Content\images\supergrid\tree\folder-open.gif" />
+    <Content Include="Content\images\supergrid\tree\folder.gif" />
+    <Content Include="Content\images\supergrid\tree\hover.png" />
+    <Content Include="Content\images\supergrid\tree\lastCollapseNode.gif" />
+    <Content Include="Content\images\supergrid\tree\lastExpandNode.gif" />
+    <Content Include="Content\images\supergrid\tree\lastline.gif" />
+    <Content Include="Content\images\supergrid\tree\leaf.gif" />
+    <Content Include="Content\images\supergrid\tree\loading.gif" />
+    <Content Include="Content\images\supergrid\tree\radio_checked.gif" />
+    <Content Include="Content\images\supergrid\tree\radio_unchecked.gif" />
+    <Content Include="Content\images\supergrid\tree\treeline.gif" />
+    <Content Include="Content\images\supergrid\tree\treeNodeLine.gif" />
+    <Content Include="Content\images\supertree\arrows.gif" />
+    <Content Include="Content\images\supertree\collapse.gif" />
+    <Content Include="Content\images\supertree\expand.gif" />
+    <Content Include="Content\images\supertree\file.gif" />
+    <Content Include="Content\images\supertree\folder-open.gif" />
+    <Content Include="Content\images\supertree\folder.gif" />
+    <Content Include="Content\images\supertree\loading.gif" />
+    <Content Include="Content\images\tabs\allow_left.gif" />
+    <Content Include="Content\images\tabs\allow_right.gif" />
+    <Content Include="Content\images\tabs\close.gif" />
+    <Content Include="Content\images\tabs\down.gif" />
+    <Content Include="Content\images\tabs\hover.png" />
+    <Content Include="Content\images\tabs\tab.png" />
+    <Content Include="Content\images\textboxlist\close.gif" />
+    <Content Include="Content\images\textboxlist\error.gif" />
+    <Content Include="Content\images\textboxlist\loading.gif" />
+    <Content Include="Content\images\textbox\error.gif" />
+    <Content Include="Content\images\toolbar\toolbar.png" />
+    <Content Include="Content\images\toolbar\treegrid\collapse.gif" />
+    <Content Include="Content\images\toolbar\treegrid\expand.gif" />
+    <Content Include="Content\images\toolbar\treegrid\file.png" />
+    <Content Include="Content\images\toolbar\treegrid\folder.gif" />
+    <Content Include="Content\images\toolbar\treegrid\loading.gif" />
+    <Content Include="Content\images\tools\close.gif" />
+    <Content Include="Content\images\tools\collapse.gif" />
+    <Content Include="Content\images\tools\expand.gif" />
+    <Content Include="Content\images\tools\max.gif" />
+    <Content Include="Content\images\tools\min.gif" />
+    <Content Include="Content\images\tools\refresh.gif" />
+    <Content Include="Content\images\tools\restore.gif" />
+    <Content Include="Content\images\tools\search.gif" />
+    <Content Include="Content\images\tooltip\wait.gif" />
+    <Content Include="Content\images\tree\arrows.gif" />
+    <Content Include="Content\images\tree\button.png" />
+    <Content Include="Content\images\tree\collapse.gif" />
+    <Content Include="Content\images\tree\collapseLine.gif" />
+    <Content Include="Content\images\tree\expand.gif" />
+    <Content Include="Content\images\tree\expandLine.gif" />
+    <Content Include="Content\images\tree\file.png" />
+    <Content Include="Content\images\tree\firstAndlastcollapse.gif" />
+    <Content Include="Content\images\tree\firstAndlastexpand.gif" />
+    <Content Include="Content\images\tree\firstCollapseNode.gif" />
+    <Content Include="Content\images\tree\firstExpandNode.gif" />
+    <Content Include="Content\images\tree\folder-open.gif" />
+    <Content Include="Content\images\tree\folder.gif" />
+    <Content Include="Content\images\tree\hover.png" />
+    <Content Include="Content\images\tree\lastCollapseNode.gif" />
+    <Content Include="Content\images\tree\lastExpandNode.gif" />
+    <Content Include="Content\images\tree\lastline.gif" />
+    <Content Include="Content\images\tree\leaf.gif" />
+    <Content Include="Content\images\tree\loading.gif" />
+    <Content Include="Content\images\tree\radio_checked.gif" />
+    <Content Include="Content\images\tree\radio_unchecked.gif" />
+    <Content Include="Content\images\tree\treeline.gif" />
+    <Content Include="Content\images\tree\treeNodeLine.gif" />
+    <Content Include="Content\images\window\footer.png" />
+    <Content Include="Content\images\window\header.png" />
+    <Content Include="Content\images\_pager\first.gif" />
+    <Content Include="Content\images\_pager\last.gif" />
+    <Content Include="Content\images\_pager\next.gif" />
+    <Content Include="Content\images\_pager\prev.gif" />
+    <Content Include="Content\miniui-icons.css" />
+    <Content Include="Content\miniui.css" />
+    <Content Include="Content\skin.css" />
+    <Content Include="editors\images\add.png" />
+    <Content Include="editors\images\B.jpg" />
+    <Content Include="editors\images\C.jpg" />
+    <Content Include="editors\images\camera.png" />
+    <Content Include="editors\images\check.png" />
+    <Content Include="editors\images\close.png" />
+    <Content Include="editors\images\connector.gif" />
+    <Content Include="editors\images\copy.png" />
+    <Content Include="editors\images\cut.png" />
+    <Content Include="editors\images\delete2.png" />
+    <Content Include="editors\images\dot.gif" />
+    <Content Include="editors\images\export1.png" />
+    <Content Include="editors\images\fit_to_size.png" />
+    <Content Include="editors\images\gradient_background.jpg" />
+    <Content Include="editors\images\green-dot.gif" />
+    <Content Include="editors\images\group.png" />
+    <Content Include="editors\images\handle-connect.png" />
+    <Content Include="editors\images\handle-main.png" />
+    <Content Include="editors\images\icons48\column.png" />
+    <Content Include="editors\images\icons48\earth.png" />
+    <Content Include="editors\images\icons48\gear.png" />
+    <Content Include="editors\images\icons48\keys.png" />
+    <Content Include="editors\images\icons48\mail_new.png" />
+    <Content Include="editors\images\icons48\server.png" />
+    <Content Include="editors\images\icons48\table.png" />
+    <Content Include="editors\images\key.png" />
+    <Content Include="editors\images\navigate_minus.png" />
+    <Content Include="editors\images\navigate_plus.png" />
+    <Content Include="editors\images\paste.png" />
+    <Content Include="editors\images\plus.png" />
+    <Content Include="editors\images\press32.png" />
+    <Content Include="editors\images\print32.png" />
+    <Content Include="editors\images\redo.png" />
+    <Content Include="editors\images\S.jpg" />
+    <Content Include="editors\images\sidebar_bg.gif" />
+    <Content Include="editors\images\spacer.gif" />
+    <Content Include="editors\images\toolbar_bg.gif" />
+    <Content Include="editors\images\U.jpg" />
+    <Content Include="editors\images\undo.png" />
+    <Content Include="editors\images\V.jpg" />
+    <Content Include="editors\images\view_1_1.png" />
+    <Content Include="editors\images\view_1_132.png" />
+    <Content Include="editors\images\view_next.png" />
+    <Content Include="editors\images\view_previous.png" />
+    <Content Include="editors\images\wires-grid.gif" />
+    <Content Include="editors\images\zoom_in.png" />
+    <Content Include="editors\images\zoom_in32.png" />
+    <Content Include="editors\images\zoom_out.png" />
+    <Content Include="editors\images\zoom_out32.png" />
+    <Content Include="HtmlPage1.html" />
+    <Content Include="HtmlPage10.html" />
+    <Content Include="HtmlPage2-1.html" />
+    <Content Include="HtmlPage2-2.html" />
+    <Content Include="HtmlPage2-3.html" />
+    <Content Include="HtmlPage2-4.html" />
+    <Content Include="HtmlPage2.html" />
+    <Content Include="editors\images\grid.gif" />
+    <Content Include="HtmlPage3.html" />
+    <Content Include="HtmlPage4.html" />
+    <Content Include="HtmlPage5.html" />
+    <Content Include="HtmlPage6.html" />
+    <Content Include="HtmlPage7.html" />
+    <Content Include="HtmlPage8.html" />
+    <Content Include="HtmlPage9.html" />
+    <Content Include="main.html" />
+    <Content Include="packages.config" />
+    <None Include="Scripts\jquery-3.3.1.intellisense.js" />
+    <Content Include="Scripts\jquery-3.3.1.js" />
+    <Content Include="Scripts\jquery-3.3.1.min.js" />
+    <Content Include="Scripts\jquery-3.3.1.slim.js" />
+    <Content Include="Scripts\jquery-3.3.1.slim.min.js" />
+    <Content Include="Scripts\jquery-3.3.1.slim.min.map" />
+    <Content Include="Scripts\jquery-3.3.1.min.map" />
+    <None Include="Scripts\linq-vsdoc.js" />
+    <Content Include="Scripts\linq.js" />
+    <Content Include="Scripts\linq.min.js" />
+    <Content Include="Scripts\locale\en_US.js" />
+    <Content Include="Scripts\locale\zh_CN.js" />
+    <Content Include="Scripts\miniui.js" />
+    <Content Include="Scripts\pagertree.js" />
+    <Content Include="Web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="data\" />
+    <Folder Include="src\css\" />
+    <Folder Include="src\js\" />
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>31076</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:31076/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

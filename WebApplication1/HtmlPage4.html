@@ -1,0 +1,158 @@
+﻿<!DOCTYPE html>
+<html xmlns=http://www.w3.org/1999/xhtml>
+<head>
+    <meta http-equiv=Content-Type content="text/html;charset=utf-8">
+    <title>右键菜单</title>
+
+    <style type="text/css">
+        body div.mxPopupMenu {
+            -webkit-box-shadow: 3px 3px 6px #C0C0C0;
+            -moz-box-shadow: 3px 3px 6px #C0C0C0;
+            box-shadow: 3px 3px 6px #C0C0C0;
+            background: white;
+            position: absolute;
+            border: 3px solid #e7e7e7;
+            padding: 3px;
+        }
+
+        body table.mxPopupMenu {
+            border-collapse: collapse;
+            margin: 0px;
+        }
+
+        body tr.mxPopupMenuItem {
+            color: black;
+            cursor: default;
+        }
+
+        body td.mxPopupMenuItem {
+            padding: 6px 60px 6px 30px;
+            font-family: Arial;
+            font-size: 10pt;
+        }
+
+        body td.mxPopupMenuIcon {
+            background-color: white;
+            padding: 0px;
+        }
+
+        body tr.mxPopupMenuItemHover {
+            background-color: #eeeeee;
+            color: black;
+        }
+
+        table.mxPopupMenu hr {
+            border-top: solid 1px #cccccc;
+        }
+
+        table.mxPopupMenu tr {
+            font-size: 4pt;
+        }
+    </style>
+
+    <!-- 如果本文件的包与src不是在同一个目录,就要将basepath设置到src目录下 ？？这个可以不用？？-->
+    <script type="text/javascript">
+        mxBasePath = '../src';
+    </script>
+
+    <!-- 引入支持库文件 -->
+    <script type="text/javascript" src="../src/js/mxClient.js"></script>
+    <!-- 示例代码 -->
+    <script type="text/javascript">
+        // 程序在此方法中启动
+        function main(container) {
+            // 检查浏览器支持
+            if (!mxClient.isBrowserSupported()) {
+                mxUtils.error('Browser is not supported!', 200, false);
+            }
+            else {
+                // 禁用浏览器自带右键菜单
+                mxEvent.disableContextMenu(document.body);
+
+                // 去锯齿效果
+                mxRectangleShape.prototype.crisp = true;
+                //// 缩放
+                //mxEvent.addMouseWheelListener(function (evt, up) {
+                //    if (up) {
+                //        graph.zoomIn();
+                //    } else {
+                //        graph.zoomOut();
+                //    }
+                //    mxEvent.consume(evt);
+                //});
+
+
+                // 在容器中创建图形
+                var graph = new mxGraph(container);
+                // Enables tooltips, new connections and panning
+                graph.setPanning(true);
+                graph.setTooltips(true);
+                graph.setConnectable(true);
+
+                // 创建下拉菜单
+                new mxRubberband(graph);
+
+                // 创建默认窗体
+                var parent = graph.getDefaultParent();
+                graph.setEnabled(true);
+                document.body.appendChild(mxUtils.button('View XML', function () {
+                    var encoder = new mxCodec();
+                    var node = encoder.encode(graph.getModel());
+                    mxUtils.popup(mxUtils.getPrettyXml(node), true);   //以窗口的方式展示处理
+                }));
+                // 启动更新事务
+                graph.getModel().beginUpdate();
+                try {
+                    var v1 = graph.insertVertex(parent, null, 'Hello,', 20, 20, 80, 30);
+                    var v2 = graph.insertVertex(parent, null, 'World!', 200, 150, 80, 30);
+                    var e1 = graph.insertEdge(parent, null, '', v1, v2);
+                }
+                finally {
+                    // 结束更新事务
+                    graph.getModel().endUpdate();
+                }
+                graph.panningHandler.panningEnabled = true;
+                //graph.panningHandler.panningTrigger = true;
+
+                // 设置自动扩大鼠标悬停
+                graph.panningHandler.autoExpand = true;
+
+
+                // 覆写右键单击事件
+                graph.popupMenuHandler.factoryMethod = function (menu, cell, evt) {
+                    createPopupMenu(graph, menu, cell, evt);
+                };
+            }
+        };
+        // Function to create the entries in the popupmenu
+        function createPopupMenu(graph, menu, cell, evt) {
+            if (cell != null) {
+                menu.addItem('添加进料', null, function () {
+                    mxUtils.alert('MenuItem1');
+                });
+                menu.addItem('添加出料', null, function () {
+                    mxUtils.alert('MenuItem1');
+                });
+            }
+            else {
+                menu.addItem('添加装置', null, function () {
+                    mxUtils.alert('MenuItem2');
+                });
+            }
+            //menu.addSeparator();
+            //menu.addItem('MenuItem3', '../src/images/warning.gif', function () {
+            //    mxUtils.alert('MenuItem3: ' + graph.getSelectionCount() + ' selected');
+            //});
+        };
+    </script>
+</head>
+
+<!-- 页面载入时启动程序 -->
+<body onload="main(document.getElementById('graphContainer'))">
+
+    <!-- 创建带网格壁纸和曲线的一个容器  -->
+    <div id="graphContainer"
+         style="overflow:hidden;width:500px;height:500px;background:url('editors/images/grid.gif');cursor:default;">
+    </div>
+</body>
+</html>  

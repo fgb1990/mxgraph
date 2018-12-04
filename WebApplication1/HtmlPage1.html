@@ -1,0 +1,100 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Hello, World! example for mxGraph</title>
+
+    <!-- 如果不在相同路径，设置basepath为开发库的路径 -->
+    <script type="text/javascript">
+        mxBasePath = '../src';
+    </script>
+
+    <!-- 加载并初始化开发库 -->
+    <script type="text/javascript" src="../src/js/mxClient.js"></script>
+
+    <!-- 示例代码 -->
+    <script type="text/javascript">
+        // 程序从这里开始。创建DOM节点中指定标记的简单图形。
+        // 方法在文档的onLoad事件处理中被调用（如下所示）。
+        function main(container) {
+            // 检查浏览器支持
+            if (!mxClient.isBrowserSupported()) {
+                mxUtils.error('Browser is not supported!', 200, false);
+            }
+            else {
+                //创建一个画板
+                var graph = new mxGraph(container);
+                var parent = graph.getDefaultParent();
+                graph.getModel().beginUpdate();
+                try {
+                    //参数：节点显示的内容、X、Y、宽度、高度，X、Y是相对于DOM节点中的位置
+                    var v1 = graph.insertVertex(parent, null, '节点一', 20, 100, 300, 145, 'rounded;strokeColor=blue;fillColor=red;');
+                    var v2 = graph.insertVertex(parent, null, '节点二', 20, 400, 300, 145, 'rounded;strokeColor=blue;fillColor=none;');
+                    //圆形节点
+                    var v3 = graph.insertVertex(parent, null, 'B', 80, 100, 100, 100, 'shape=ellipse;perimeter=ellipsePerimeter');
+                    //三角形节点
+                    var v4 = graph.insertVertex(parent, null, 'C', 190, 30, 100, 60, 'shape=triangle;perimeter=trianglePerimeter;direction=south');
+                    //节点是否可以折叠
+                    graph.getModel().setCollapsed(v2, 1);
+                    var html = '<div>html</div>';
+                    //更新节点显示的内容
+                    graph.getModel().setValue(v1, html);
+                    //连接线，连接线上显示的内容，连接的两个节点，连接线的样式
+                    var e1 = graph.insertEdge(parent, null, '我1连2', v1, v2, "strokeWidth=5;labelBackgroundColor=white;fontStyle=1");
+                    //直角连线 
+                    var e2 = graph.insertEdge(parent, null, '我是直角连线', v1, v2, 'edgeStyle=orthogonalEdgeStyle;');
+                    //曲折连线
+                    var e2 = graph.insertEdge(parent, null, '我是曲折连线', v3, v2, 'edgeStyle=elbowEdgeStyle;elbow=horizontal;orthogonal=0;entryPerimeter=1;');
+                    //虚线连线
+                    graph.insertEdge(parent, null, "我是虚线连线", v4, v2, 'edgeStyle:crossoverEdgeStyle;');
+                    document.body.appendChild(mxUtils.button('获取画布所有信息', function (evt) {
+                        GetAll(parent);
+                    }));
+                    console.log(parent.children);
+                }
+                finally {
+                    graph.getModel().endUpdate();
+                }              
+
+            }
+        };
+        function GetAll(parent)
+        {
+            var parentChildren = parent.children;
+            var arrEdge = [];   //连接线
+            var arrVertex = []; //节点
+            //获取所有信息
+            debugger;
+            for (var i = 0; i < parentChildren.length; i++) {
+                var child = parentChildren[i];
+                if (!child.isVisible()) {
+                    continue;
+                }
+                //区分连接线、节点
+                if (child.isEdge()) {
+                    var obj = new Object();
+                    obj.ID = child.id;
+                    obj.SourceID = child.source.id;
+                    obj.TargetID = child.target.id;
+                    arrEdge.push(obj)
+                } else if (child.isVertex()) {
+                    var obj = new Object();
+                    obj.ID = child.id;
+                    obj.Name = child.value;
+                    obj.LeftTopX = child.geometry.x;
+                    obj.LeftTopY = child.geometry.y;
+                    arrVertex.push(obj);
+                }
+            }          
+        }
+    </script>
+</head>
+
+<!-- 页面传递图形的容器给程序 -->
+<body onload="main(document.getElementById('graphContainer'))">
+
+    <!-- 创建一个带有网格背景图的容器 -->
+    <div id="graphContainer"
+         style="overflow:hidden;width:8000px;height:100%;background:url('editors/images/grid.gif')">
+    </div>
+</body>
+</html>

@@ -1,0 +1,515 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Hello, World! example for mxGraph</title>
+    <style type="text/css">
+        body div.mxPopupMenu {
+            -webkit-box-shadow: 3px 3px 6px #C0C0C0;
+            -moz-box-shadow: 3px 3px 6px #C0C0C0;
+            box-shadow: 3px 3px 6px #C0C0C0;
+            background: white;
+            position: absolute;
+            border: 3px solid #e7e7e7;
+            padding: 3px;
+        }
+
+        body table.mxPopupMenu {
+            border-collapse: collapse;
+            margin: 0px;
+        }
+
+        body tr.mxPopupMenuItem {
+            color: black;
+            cursor: default;
+        }
+
+        body td.mxPopupMenuItem {
+            padding: 6px 60px 6px 30px;
+            font-family: Arial;
+            font-size: 10pt;
+        }
+
+        body td.mxPopupMenuIcon {
+            background-color: white;
+            padding: 0px;
+        }
+
+        body tr.mxPopupMenuItemHover {
+            background-color: #eeeeee;
+            color: black;
+        }
+
+        table.mxPopupMenu hr {
+            border-top: solid 1px #cccccc;
+        }
+
+        table.mxPopupMenu tr {
+            font-size: 4pt;
+        }
+    </style>
+
+
+
+    <!-- 如果不在相同路径，设置basepath为开发库的路径 -->
+    <script type="text/javascript">
+        mxBasePath = '../src';
+    </script>
+
+    <!-- 加载并初始化开发库 -->
+    <script type="text/javascript" src="../src/js/mxClient.js"></script>
+    <script src="Scripts/linq.js"></script>
+    <script src="Scripts/jquery-3.3.1.js"></script>
+    <script src="Scripts/miniui.js"></script>
+    <link href="Content/miniui.css" rel="stylesheet" />
+    <!-- 示例代码 -->
+    <script type="text/javascript">
+        // 声明一个object
+        var style = {};
+        // 克隆一个object
+        style = mxUtils.clone(style);
+        style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_LABEL;  // 不设置这个属性 背景图片不出来
+        // 边框颜色
+        style[mxConstants.STYLE_STROKECOLOR] = '#999999';
+        // 边框大小
+        style[mxConstants.STYLE_STROKEWIDTH] = 10;
+        // 字体颜色
+        style[mxConstants.STYLE_FONTCOLOR] = '#000000';
+        // 文字水平方式
+        style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_CENTER;
+        // 文字垂直对齐
+        style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_BOTTOM;
+        // 字体大小
+        style[mxConstants.STYLE_FONTSIZE] = 30;
+        // 底图水平对齐
+        style[mxConstants.STYLE_IMAGE_ALIGN] = mxConstants.ALIGN_CENTER;
+        // 底图垂直对齐
+        style[mxConstants.STYLE_IMAGE_VERTICAL_ALIGN] = mxConstants.ALIGN_CENTER;
+        // 图片路径
+        //style[mxConstants.STYLE_IMAGE] = 'editors/images/C.jpg';
+        // 背景图片宽
+        style[mxConstants.STYLE_IMAGE_WIDTH] = 40;
+        // 背景图片高
+        style[mxConstants.STYLE_IMAGE_HEIGHT] = 300;
+        // 上间距设置
+        // 即使下边定义了全局设置，但这里单独设置上边间距仍单独有效
+        style[mxConstants.STYLE_SPACING_TOP] = 30;
+        // 四边间距设置
+        style[mxConstants.STYLE_SPACING] = 10;
+        window.onload = function () {
+            var container = document.getElementById("main");
+            //设置背景样式
+            container.style.background = 'url(editors/images/grid.gif)';
+            //container.style.height = "600px";
+            container.style.padding = "100px";
+            //创建一个画板
+            var graph = new mxGraph(container);
+            // 禁用浏览器自带右键菜单
+            mxEvent.disableContextMenu(document.body);
+            // 去锯齿效果
+            mxRectangleShape.prototype.crisp = true;
+            // 创建下拉菜单
+            new mxRubberband(graph);
+            //graph.setCellsResizable(false); //节点不可改变大小
+            mxGraphHandler.prototype.setMoveEnabled(true); //是否可以移动
+            //mxGraphHandler.prototype.guidesEnabled = true; //显示细胞位置标尺
+            //graph.setEnabled(true);//是否只读
+            //graph.setConnectable(true);//cell是否可以连线
+            //graph.setCellsLocked(false);//是否可以移动连线，重新连接其他cell，主要用来展现中用
+            //graph.setConnectable(true); // 是否允许Cells通过其中部的连接点新建连接,false则通过连接线连接
+            /*禁用节点双击，防止改变数据 */
+            graph.dblClick = function (evt, cell) {
+                mini.open({
+                    targetWindow: window,
+                    url: "http://www.baidu.com",
+                    title: "编辑数据", width: 600, height: 400,
+                    onload: function () {
+                        var iframe = this.getIFrameEl();
+                        var data = { action: "new" };
+                        iframe.contentWindow.SetData(data);
+                    },
+                    ondestroy: function (action) {
+                        //alert("123");
+                        //grid.reload();
+                    }
+                });
+
+                //var model = graph.getModel();
+                //if (model.isVertex(cell)) {
+                //    return false;
+                //}
+            };
+            // 节点是否解析html
+            graph.setHtmlLabels(true);
+            console.log(mxGraphHandler);
+            // 开启提示
+            graph.setTooltips(true);
+            //获取顶层，可以认为是父节点
+            new mxCellTracker(graph);
+            var parent = graph.getDefaultParent();
+
+            // 开启拖拽选择
+            //new mxRubberband(graph);
+            // 把定义好的样式object push到stylesheet
+            graph.getStylesheet().putCellStyle("style1", style);
+            //单击监听事件
+            graph.addListener(mxEvent.CLICK, function (sender, evt) {
+                var e = evt.getProperty('event'); // mouse event
+                var cell = evt.getProperty('cell'); // cell may be null
+
+                if (cell != null) {
+                    evt.consume();
+                    $("#t1").val(cell.value);
+                    console.log(cell);
+                }
+            });
+            //移动监听
+            graph.addListener(mxEvent.CELLS_MOVED, function (sender, evt) {
+                var e = evt.getProperty('event'); // mouse event
+                var cells = evt.getProperty('cells'); // cell may be null
+
+                if (cells != null) {
+                    evt.consume();
+                    RefreshEageIn(graph);
+                    RefreshEageOut(graph);
+                }
+            });
+            //调整大小监听
+            graph.addListener(mxEvent.CELLS_RESIZED, function (sender, evt) {
+                /*重新绘制进出料位置*/
+                RefreshEageIn(graph);
+                RefreshEageOut(graph);
+                var cells = evt.getProperty('cells');
+                if (cells != null) {
+                    for (var i = 0; i < cells.length; i++) {
+                        /*修改样式*/
+                        graph.setCellStyles(mxConstants.STYLE_IMAGE_WIDTH, cells[i].geometry.width, [cells[i]]);
+                        graph.setCellStyles(mxConstants.STYLE_IMAGE_HEIGHT, cells[i].geometry.height, [cells[i]]);
+                        if (graph.getModel().getChildCount(cells[i]) > 0) {
+                            var geo = graph.getCellGeometry(cells[i]);
+
+                            if (geo != null) {
+                                var children = graph.getChildCells(cells[i], true, true);
+                                var bounds = graph.getBoundingBoxFromGeometry(children, true);
+
+                                geo = geo.clone();
+                                geo.width = Math.max(geo.width, bounds.width);
+                                geo.height = Math.max(geo.height, bounds.height);
+
+                                graph.getModel().setGeometry(cells[i], geo);
+                            }
+
+                        }
+                    }
+                }
+            });
+            //撤销监听
+            var undoMng = new mxUndoManager();
+            var listener = function (sender, evt) {
+                undoMng.undoableEditHappened(evt.getProperty('edit'));
+            };
+            graph.getModel().addListener(mxEvent.UNDO, listener);
+            graph.getView().addListener(mxEvent.UNDO, listener);
+            // 设置自动扩大鼠标悬停
+            graph.panningHandler.autoExpand = true;
+
+            // 覆写右键单击事件
+            graph.popupMenuHandler.factoryMethod = function (menu, cell, evt) {
+                createPopupMenu(graph, menu, cell, evt);
+            };
+            // 添加按钮
+            document.body.appendChild(mxUtils.button('增加进料', function (evt) {
+                MatialIn(graph);
+            }));
+            document.body.appendChild(mxUtils.button('增加出料', function (evt) {
+                MatialOut(graph);
+            }));
+            document.body.appendChild(mxUtils.button('增加常压装置', function (evt) {
+                var X = GetRandomNum(100, 800);
+                AddUnit(graph, X, 250, "C");
+            }));
+            document.body.appendChild(mxUtils.button('导入', function (evt) {
+                Import(graph);
+            }));
+            //删除选中Cell或者Edge
+            var keyHandler = new mxKeyHandler(graph);
+            keyHandler.bindKey(46, function (evt) {
+                if (graph.isEnabled()) {
+                    graph.removeCells();
+                }
+            });
+            // 添加按钮
+            document.body.appendChild(mxUtils.button('修改背景颜色', function (evt) {
+                // Alaer
+                mxUtils.alert("Oh! You will Click me!!");
+                // 获取单元
+                var cell = graph.getModel().getCell(v1.id);
+                // 修改样式
+                graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, "#000000", [cell]);
+                graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, "#FFFFFF", [cell]);
+            }));
+
+            // 添加按钮
+            document.body.appendChild(mxUtils.button('还原背景颜色', function (evt) {
+                // 获取单元
+                var cell = graph.getModel().getCell(v1.id);
+                // 获取默认样式
+                var style = graph.getStylesheet().getDefaultVertexStyle();
+                // 还原默认样式
+                for (var i in mxConstants) {
+                    graph.setCellStyles(mxConstants[i], style[mxConstants[i]], [cell]);
+                }
+            }));
+            // 居中缩放
+            graph.centerZoom = true;
+            // 放大按钮
+            document.body.appendChild(mxUtils.button('放大 +', function (evt) {
+                graph.zoomIn();
+            }));
+            // 缩小按钮
+            document.body.appendChild(mxUtils.button('缩小 -', function (evt) {
+                graph.zoomOut();
+            }));
+            // 还原按钮
+            document.body.appendChild(mxUtils.button('还原 #', function (evt) {
+                graph.zoomActual();
+                graph.zoomFactor = 1.2;
+                input.value = 1.2;
+            }));
+            var input = document.createElement("input");
+            input.type = "text";
+            input.value = graph.zoomFactor;
+            input.addEventListener("blur", function () {
+                graph.zoomFactor = parseFloat(this.value, 10);
+            });
+            document.body.appendChild(input);
+            // 打印
+            document.body.appendChild(mxUtils.button('打印', function (evt) {
+                mxUtils.printScreen(graph);
+            }));
+            document.body.appendChild(mxUtils.button('复制', function (evt) {
+                var cells = new Array();
+                cells = graph.getSelectionCells();
+                mxClipboard.copy(graph, cells);
+            }));
+            document.body.appendChild(mxUtils.button('剪贴', function (evt) {
+                var cells = new Array();
+                cells = graph.getSelectionCells();
+                mxClipboard.cut(graph, cells);
+            }));
+            document.body.appendChild(mxUtils.button('粘贴', function (evt) {
+                mxClipboard.paste(graph);
+            }));
+            document.body.appendChild(mxUtils.button('删除', function (evt) {
+                var cells = new Array();
+                cells = graph.getSelectionCells();
+                mxClipboard.removeCells(graph, cells);
+            }));
+            document.body.appendChild(mxUtils.button('撤销', function (evt) {
+                undoMng.undo();
+            }));
+            document.body.appendChild(mxUtils.button('刷新', function (evt) {
+                RefreshModel();
+            }));
+            //document.body.appendChild(mxUtils.button('重做', function (evt) {
+            //    //undoMng.redo();
+            //}));
+            // 开启可以拖拽建立关系
+            //graph.setConnectable(true);
+            // 开启方块上的文字编辑功能
+            //graph.setCellsEditable(true);
+            // 启用对齐线帮助定位
+            //mxGraphHandler.prototype.guidesEnabled = true;
+            // 选择基本元素开启
+            graph.setEnabled(true);
+            document.body.appendChild(mxUtils.button('View XML', function () {
+                var encoder = new mxCodec();
+                var node = encoder.encode(graph.getModel());
+                mxUtils.popup(mxUtils.getPrettyXml(node), true);   //以窗口的方式展示处理
+            }));
+            var button = mxUtils.button('提交', function (evt) {
+                SubmitData(graph);
+            });
+            button.style.position = 'absolute';
+            button.style.left = '220px';
+            button.style.top = '5px';
+            document.body.appendChild(button);
+            // 选择所有
+            document.body.appendChild(mxUtils.button('选择所有', function (evt) {
+                graph.selectAll();
+                var cells = graph.getSelectionCells();
+                for (var i = 0; i < cells.length; i++) {
+                    var x = GetRandomNum(1, 100);
+                    var y = -10;
+                    graph.moveCells([cells[i]], x, y);
+                }
+
+            }));
+            function GetRandomNum(Min, Max) {
+                var Range = Max - Min;
+                var Rand = Math.random();
+                return (Min + Math.round(Rand * Range));
+            }
+
+        }
+        function MatialIn(graph) {
+            var cell = graph.getSelectionCells()[0];
+            var parent = graph.getDefaultParent();
+            var v1 = graph.insertVertex(parent, null, "", cell.geometry.x - 200, cell.geometry.y + (cell.geometry.height) / 2, 0, 0);
+            // 在一个步骤中，加入所有的单元到模型中
+            graph.getModel().beginUpdate();
+            try {
+                var e1 = graph.insertEdge(parent, null, 'to', v1, cell, "entryX=0;entryY=0.5;");
+            }
+            finally {
+                // 更新显示
+                graph.getModel().endUpdate();
+            }
+            RefreshEageIn(graph);
+        }
+        function RefreshEageIn(graph) {
+            var cell = graph.getSelectionCells()[0];
+            var Count = 0;
+            if (cell.edges == null) {
+                return;
+            }
+            for (var i = 0; i < cell.edges.length; i++) {
+                if (cell.edges[i].target == cell) {
+                    Count++;
+                }
+            }
+            if (Count == 0)
+            { return; }
+            var EageCount = 0;
+            for (var i = 0; i < cell.edges.length; i++) {
+                if (cell.edges[i].target == cell) {
+                    var CellArray = [cell.edges[i].source];
+                    var OY = CellArray[0].geometry.y;
+                    var NY = cell.geometry.y + (cell.geometry.height) / (Count + 1) * (EageCount + 1);
+                    var OX = CellArray[0].geometry.x;
+                    var NX = cell.geometry.x - 200;
+                    EageCount++;
+                    graph.moveCells(CellArray, NX - OX, NY - OY);
+                    var eage = cell.edges[i];
+                    var eageSourceHeight = (NY - cell.geometry.y) / cell.geometry.height;
+                    //eage.setStyle("entryX=0;entryY=" + eageSourceHeight + ";");
+                    graph.setCellStyles(mxConstants.STYLE_ENTRY_X, 0, [eage]);
+                    graph.setCellStyles(mxConstants.STYLE_ENTRY_Y, eageSourceHeight, [eage]);
+                }
+            }
+
+        }
+        function MatialOut(graph) {
+            var cell = graph.getSelectionCells()[0];
+            var parent = graph.getDefaultParent();
+            var v1 = graph.insertVertex(parent, null, "", (cell.geometry.x + cell.geometry.width) + 200, cell.geometry.y + (cell.geometry.height) / 2, 0, 0);
+            // 在一个步骤中，加入所有的单元到模型中
+            graph.getModel().beginUpdate();
+            try {
+                var e1 = graph.insertEdge(parent, null, 'to', cell, v1, "exitX=1;exitY=0.5;");
+
+            }
+            finally {
+                // 更新显示
+                graph.getModel().endUpdate();
+            }
+            RefreshEageOut(graph);
+        }
+        function RefreshEageOut(graph) {
+            var cell = graph.getSelectionCells()[0];
+            var Count = 0;
+            if (cell.edges == null) {
+                return;
+            }
+            for (var i = 0; i < cell.edges.length; i++) {
+                if (cell.edges[i].source == cell) {
+                    Count++;
+                }
+            }
+            if (Count == 0)
+            { return; }
+            var EageCount = 0;
+            for (var i = 0; i < cell.edges.length; i++) {
+                if (cell.edges[i].source == cell) {
+                    var CellArray = [cell.edges[i].target];
+                    var OY = CellArray[0].geometry.y;
+                    var NY = cell.geometry.y + (cell.geometry.height) / (Count + 1) * (EageCount + 1);
+                    var OX = CellArray[0].geometry.x;
+                    var NX = cell.geometry.x + cell.geometry.width + 200;
+                    EageCount++;
+                    graph.moveCells(CellArray, NX - OX, NY - OY);
+                    var eage = cell.edges[i];
+                    var eageTargetHeight = (NY - cell.geometry.y) / cell.geometry.height;
+
+                    //eage.setStyle("exitX=1;exitY=" + eageTargetHeight + ";");
+                    graph.setCellStyles(mxConstants.STYLE_EXIT_X, 1, [eage]);
+                    graph.setCellStyles(mxConstants.STYLE_EXIT_Y, eageTargetHeight, [eage]);
+                }
+            }
+        }
+        function AddUnit(graph, X, Y, type) {
+            var Unit;
+            if (type == "C") {
+                Unit = graph.insertVertex(graph.getDefaultParent(), null, '常压', X, Y, 40, 300, "style1");
+                graph.setCellStyles(mxConstants.STYLE_IMAGE, "editors/images/C.jpg", [Unit]);
+            }
+            if (type == "V") {
+                Unit = graph.insertVertex(graph.getDefaultParent(), null, '调和池', X, Y, 40, 300, "style1");
+                graph.setCellStyles(mxConstants.STYLE_IMAGE, "editors/images/V.jpg", [Unit]);
+            }
+        }
+        function Import(graph) {
+            var xml = '<mxGraphModel><root><mxCell id="0"/><mxCell id="1" parent="0"/><mxCell id="2" value="常压" vertex="1" parent="1"><mxGeometry x="400" y="230" width="50" height="400" as="geometry"/><Object shape="label" strokeColor="#999999" strokeWidth="10" fontColor="#FFFF00" align="center" verticalAlign="bottom" fontSize="30" imageAlign="center" imageVerticalAlign="center" image="editors/images/C.jpg" imageWidth="50" imageHeight="400" spacingTop="30" spacing="10" as="style"/></mxCell><mxCell id="3" value="常压" vertex="1" parent="1"><mxGeometry x="690" y="210" width="50" height="400" as="geometry"/><Object shape="label" strokeColor="#999999" strokeWidth="10" fontColor="#FFFF00" align="center" verticalAlign="bottom" fontSize="30" imageAlign="center" imageVerticalAlign="center" image="editors/images/C.jpg" imageWidth="50" imageHeight="400" spacingTop="30" spacing="10" as="style"/></mxCell><mxCell id="6" value="" vertex="1" parent="1"><mxGeometry x="200" y="363.33333333333337" as="geometry"/></mxCell><mxCell id="7" value="to" style="Eage" edge="1" parent="1" source="6" target="2"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="8" value="" vertex="1" parent="1"><mxGeometry x="200" y="496.6666666666667" as="geometry"/></mxCell><mxCell id="9" value="to" style="Eage" edge="1" parent="1" source="8" target="2"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="12" value="" vertex="1" parent="1"><mxGeometry x="490" y="343.33333333333337" as="geometry"/></mxCell><mxCell id="13" value="to" style="Eage" edge="1" parent="1" source="12" target="3"><mxGeometry relative="1" as="geometry"/></mxCell><mxCell id="14" value="" vertex="1" parent="1"><mxGeometry x="490" y="476.6666666666667" as="geometry"/></mxCell><mxCell id="15" value="to" style="Eage" edge="1" parent="1" source="14" target="3"><mxGeometry relative="1" as="geometry"/></mxCell></root></mxGraphModel>';
+            var doc = mxUtils.parseXml(xml);
+            var codec = new mxCodec(doc);
+            codec.decode(doc.documentElement, graph.getModel());
+        }
+        // Function to create the entries in the popupmenu
+        function createPopupMenu(graph, menu, cell, evt) {
+            console.log(evt.offsetX + "-" + evt.offsetY);
+            if (cell != null) {
+                menu.addItem('添加进料', null, function () {
+                    MatialIn(graph);
+                });
+                menu.addItem('添加出料', null, function () {
+                    MatialOut(graph)
+                });
+            }
+            else {
+                menu.addItem('添加常压装置', null, function () {
+                    AddUnit(graph, evt.offsetX, evt.offsetY, "C");
+                });
+                menu.addItem('添加调和池装置', null, function () {
+                    AddUnit(graph, evt.offsetX, evt.offsetY, "V");
+                });
+            }
+        };
+        function SubmitData(graph) {
+            graph.getModel().beginUpdate();
+            try {
+                var cell = graph.getSelectionCells()[0];
+                cell.setValue($("#t1").val());
+            }
+            finally {
+                graph.getModel().endUpdate();
+            }
+            RefreshModel(graph);
+        }
+        //刷新
+        function RefreshModel(graph) {
+            var encoder = new mxCodec();
+            var result = encoder.encode(graph.getModel());
+            var xml = mxUtils.getXml(result);
+            var doc = mxUtils.parseXml(xml);
+            var codec = new mxCodec(doc);
+            codec.decode(doc.documentElement, graph.getModel());
+        }
+    </script>
+</head>
+
+<!-- 页面传递图形的容器给程序 -->
+<body>
+    值: <input id="t1" type="text" />
+    <!-- 创建一个带有网格背景图的容器 -->
+    <div id="main"></div>
+</body>
+</html>
