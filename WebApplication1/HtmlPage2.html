@@ -89,20 +89,21 @@
         // 图片路径
         //style[mxConstants.STYLE_IMAGE] = 'editors/images/C.jpg';
         // 背景图片宽
-        style[mxConstants.STYLE_IMAGE_WIDTH] = 40;
+        style[mxConstants.STYLE_IMAGE_WIDTH] = 35;
         // 背景图片高
-        style[mxConstants.STYLE_IMAGE_HEIGHT] = 300;
+        style[mxConstants.STYLE_IMAGE_HEIGHT] = 250;
         // 上间距设置
         // 即使下边定义了全局设置，但这里单独设置上边间距仍单独有效
         style[mxConstants.STYLE_SPACING_TOP] = 30;
         // 四边间距设置
         style[mxConstants.STYLE_SPACING] = 10;
         window.onload = function () {
+            var outline = document.getElementById('outlineContainer');
             var container = document.getElementById("main");
             container.style.position = 'absolute';
             container.style.overflow = 'hidden';
             container.style.left = '24px';
-            container.style.top = '66px';
+            container.style.top = '36px';
             container.style.right = '0px';
             container.style.bottom = '0px';
             container.style.background = 'url("editors/images/grid.gif")';
@@ -128,9 +129,10 @@
                 document.body.style.overflow = 'hidden';
                 new mxDivResizer(tbContainer);
                 new mxDivResizer(container);
+                new mxDivResizer(outline);
             }
 
-            /************END侧边栏****************/
+            /************END侧边栏****************/         
             //创建一个画板
             var graph = new mxGraph(container);
             // 禁用浏览器自带右键菜单
@@ -303,6 +305,13 @@
             graph.getView().addListener(mxEvent.UNDO, listener);
             // 设置自动扩大鼠标悬停
             graph.panningHandler.autoExpand = true;
+            var span = document.createElement("span");
+            span.innerHTML = "值：";
+            document.body.appendChild(span);
+            var t1 = document.createElement("input");
+            t1.type = "text";
+            t1.id = "t1";
+            document.body.appendChild(t1);
             // 提交
             document.body.appendChild(mxUtils.button('提交', function (evt) {
                 if (graph.getSelectionCells().length != 1) {
@@ -310,26 +319,7 @@
                 }
                 var cell = graph.getSelectionCells()[0];
                 SubmitData(graph, cell);
-            }));
-            // 添加按钮
-            document.body.appendChild(mxUtils.button('增加进料', function (evt) {
-                if (graph.getSelectionCells().length != 1) {
-                    mxUtils.alert("请选择一个装置");
-                }
-                var cell = graph.getSelectionCells()[0];
-                MatialIn(graph, cell);
-            }));
-            document.body.appendChild(mxUtils.button('增加出料', function (evt) {
-                if (graph.getSelectionCells().length != 1) {
-                    mxUtils.alert("请选择一个装置");
-                }
-                var cell = graph.getSelectionCells()[0];
-                MatialOut(graph, cell);
-            }));
-            document.body.appendChild(mxUtils.button('增加常压装置', function (evt) {
-                var X = GetRandomNum(100, 800);
-                AddUnit(graph, X, 250, "C");
-            }));
+            }));  
             document.body.appendChild(mxUtils.button('导入', function (evt) {
                 Import(graph);
             }));
@@ -340,28 +330,6 @@
                     graph.removeCells();
                 }
             });
-            // 添加按钮
-            document.body.appendChild(mxUtils.button('修改背景颜色', function (evt) {
-                // Alaer
-                mxUtils.alert("Oh! You will Click me!!");
-                // 获取单元
-                var cell = graph.getModel().getCell(v1.id);
-                // 修改样式
-                graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, "#000000", [cell]);
-                graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, "#FFFFFF", [cell]);
-            }));
-
-            // 添加按钮
-            document.body.appendChild(mxUtils.button('还原背景颜色', function (evt) {
-                // 获取单元
-                var cell = graph.getModel().getCell(v1.id);
-                // 获取默认样式
-                var style = graph.getStylesheet().getDefaultVertexStyle();
-                // 还原默认样式
-                for (var i in mxConstants) {
-                    graph.setCellStyles(mxConstants[i], style[mxConstants[i]], [cell]);
-                }
-            }));
             // 居中缩放
             graph.centerZoom = true;
             // 放大按钮
@@ -381,6 +349,7 @@
             var input = document.createElement("input");
             input.type = "text";
             input.value = graph.zoomFactor;
+            input.style = "width:50px";
             input.addEventListener("blur", function () {
                 graph.zoomFactor = parseFloat(this.value, 10);
             });
@@ -431,13 +400,17 @@
                 undoMng.redo();
             }));
             document.body.appendChild(mxUtils.button('刷新', function (evt) {
-                RefreshModel();
+                RefreshModel(graph);
             }));
 
             document.body.appendChild(mxUtils.button('View XML', function () {
                 var encoder = new mxCodec();
                 var node = encoder.encode(graph.getModel());
                 mxUtils.popup(mxUtils.getPrettyXml(node), true);   //以窗口的方式展示处理
+            }));
+            document.body.appendChild(mxUtils.button('计算', function () {
+                var message = "计算完成";
+                mxUtils.popup(message, true);   //以窗口的方式展示处理
             }));
             document.body.appendChild(mxUtils.button('整理', function (evt) {
                 graph.selectAll();
@@ -466,17 +439,11 @@
                     graph.removeSelectionCells(cells);
                 }
             }));
-            var addVertex = function (icon, type) {
-                addToolbarItem(graph, toolbar, type, icon);
-            };
-
-            addVertex('editors/images/CI1.png', 'C');
-            addVertex('editors/images/VI.png', 'V');
-            function GetRandomNum(Min, Max) {
-                var Range = Max - Min;
-                var Rand = Math.random();
-                return (Min + Math.round(Rand * Range));
-            }
+            /***********左侧装置栏************/
+            addToolbarItem(graph, toolbar, 'C', 'editors/images/CI1.png');
+            addToolbarItem(graph, toolbar, 'V', 'editors/images/VI.png');       
+            // 图形窗口的右上角的周围创建导航提示。
+            var outln = new mxOutline(graph, outline);
 
         }
         function MatialIn(graph, cell) {
@@ -572,11 +539,11 @@
         function AddUnit(graph, X, Y, type) {
             var Unit;
             if (type == "C") {
-                Unit = graph.insertVertex(graph.getDefaultParent(), null, '常压', X, Y, 40, 300, "style1");
+                Unit = graph.insertVertex(graph.getDefaultParent(), null, '常压', X, Y, 35, 250, "style1");
                 graph.setCellStyles(mxConstants.STYLE_IMAGE, "editors/images/C.jpg", [Unit]);
             }
             if (type == "V") {
-                Unit = graph.insertVertex(graph.getDefaultParent(), null, '调和池', X, Y, 40, 300, "style1");
+                Unit = graph.insertVertex(graph.getDefaultParent(), null, '调和池', X, Y, 35, 250, "style1");
                 graph.setCellStyles(mxConstants.STYLE_IMAGE, "editors/images/V.jpg", [Unit]);
             }
         }
@@ -649,9 +616,13 @@
 </head>
 
 <!-- 页面传递图形的容器给程序 -->
-<body>
-    值: <input id="t1" type="text" />
+<body> 
+    <!--值: <input id="t1" type="text" />-->
     <!-- 创建一个带有网格背景图的容器 -->
-    <div id="main"></div>
+    <div id="main">  </div>
+    <!-- 创建导航框-->
+    <div id="outlineContainer"
+         style="position:absolute;overflow:hidden;top:36px;right:0px;width:200px;height:140px;background:transparent;border-style:solid;border-color:black;">
+    </div>
 </body>
 </html>

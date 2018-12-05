@@ -391,6 +391,8 @@
     <Content Include="editors\images\zoom_out32.png" />
     <Content Include="HtmlPage1.html" />
     <Content Include="HtmlPage10.html" />
+    <Content Include="HtmlPage11.html" />
+    <Content Include="跨浏览器复制.html" />
     <Content Include="HtmlPage2-1.html" />
     <Content Include="HtmlPage2-2.html" />
     <Content Include="HtmlPage2-3.html" />
@@ -406,6 +408,7 @@
     <Content Include="HtmlPage9.html" />
     <Content Include="main.html" />
     <Content Include="packages.config" />
+    <Content Include="窗口.html" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
     <Content Include="Scripts\jquery-3.3.1.min.js" />

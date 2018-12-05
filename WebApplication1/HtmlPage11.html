@@ -1,0 +1,562 @@
+﻿<!Doctype html>
+<html xmlns=http://www.w3.org/1999/xhtml>
+<head>
+    <meta http-equiv=Content-Type content="text/html;charset=utf-8">
+    <title>所有接口例子</title>
+    <!-- 字体大小风格 -->
+    <style type="text/css" media="screen">
+        BODY {
+            font-family: Arial;
+        }
+
+        H1 {
+            font-size: 18px;
+        }
+
+        H2 {
+            font-size: 16px;
+        }
+    </style>
+
+    <!-- 如果本文件的包与src不是在同一个目录,就要将basepath设置到src目录下 -->
+    <script type="text/javascript">
+        mxBasePath = '../src';
+    </script>
+
+    <!-- 引入支持库文件 -->
+    <script type="text/javascript" src="../src/js/mxClient.js"></script>
+
+    <!-- 示例代码 -->
+    <script type="text/javascript">
+        // 程序启动方法
+        function main(container, outline, toolbar, sidebar, status) {
+            // 浏览器兼容检测
+            if (!mxClient.isBrowserSupported()) {
+                mxUtils.error('Browser is not supported!', 200, false);
+            }
+            else {
+                // 定义全局变量，如。用于触发建立新的连接的活动区域的最小尺寸（以像素为单位），该部分（100％）的小区区域被用于触发新的连接，以及一些窗口和“下拉菜菜单选择
+                mxConstants.MIN_HOTSPOT_SIZE = 16;
+                mxConstants.DEFAULT_HOTSPOT = 1;
+
+                // 显示导航线
+                mxGraphHandler.prototype.guidesEnabled = true;
+
+                // Alt 键禁用导航线
+                mxGuide.prototype.isEnabledForEvent = function (evt) {
+                    return !mxEvent.isAltDown(evt);
+                };
+
+                // 自动导航目标
+                mxEdgeHandler.prototype.snapToTerminals = true;
+
+                // IE浏览器样式修复
+                if (mxClient.IS_QUIRKS) {
+                    document.body.style.overflow = 'hidden';
+                    new mxDivResizer(container);
+                    new mxDivResizer(outline);
+                    new mxDivResizer(toolbar);
+                    new mxDivResizer(sidebar);
+                    new mxDivResizer(status);
+                }
+
+                // 创建图形编辑器
+                var editor = new mxEditor();
+                var graph = editor.graph;
+                var model = graph.getModel();
+
+                // 启用高亮工具栏
+                graph.setDropEnabled(false);
+
+                // 连接预览
+                graph.connectionHandler.getConnectImage = function (state) {
+                    return new mxImage(state.style[mxConstants.STYLE_IMAGE], 16, 16);
+                };
+
+                // 显示中心端口图标
+                graph.connectionHandler.targetConnectImage = true;
+
+                // 禁止连接线晃动
+                graph.setAllowDanglingEdges(false);
+
+                //设置图形容器，并配置编辑器
+                editor.setGraphContainer(container);
+                var config = mxUtils.load(
+                    'editors/config/keyhandler-commons.xml').
+                        getDocumentElement();
+                editor.configure(config);
+
+                // 设置默认组
+                // groupBorderSize 设置图形和它的子元素的边距。
+                var group = new mxCell('Group', new mxGeometry(), 'group');
+                group.setVertex(true);
+                group.setConnectable(false);
+                editor.defaultGroup = group;
+                editor.groupBorderSize = 20;
+
+                // 目标是否有效
+                graph.isValidDropTarget = function (cell, cells, evt) {
+                    return this.isSwimlane(cell);
+                };
+
+                // 是否根元素
+                graph.isValidRoot = function (cell) {
+                    return this.isValidDropTarget(cell);
+                }
+
+                // 是否可以被选中
+                graph.isCellSelectable = function (cell) {
+                    return !this.isCellLocked(cell);
+                };
+
+                // 返回元素
+                graph.getLabel = function (cell) {
+                    var tmp = mxGraph.prototype.getLabel.apply(this, arguments); // "supercall"
+
+                    if (this.isCellLocked(cell)) {
+                        // 如元素被锁定 返回空标签
+                        return '';
+                    }
+                    else if (this.isCellCollapsed(cell)) {
+                        var index = tmp.indexOf('</h1>');
+
+                        if (index > 0) {
+                            tmp = tmp.substring(0, index + 5);
+                        }
+                    }
+
+                    return tmp;
+                }
+
+                // 禁用HTML的泳道标签，避免冲突
+                // 判断是否为泳道标签
+                graph.isHtmlLabel = function (cell) {
+                    return !this.isSwimlane(cell);
+                }
+
+                // To disable the folding icon, use the following code:
+                /*graph.isCellFoldable = function(cell)
+                {
+                    return false;
+                }*/
+
+                // 双击显示模型窗口
+                graph.dblClick = function (evt, cell) {
+                    // 如果不是双击事件，编辑器会自动处理
+                    if (this.isEnabled() &&
+                        !mxEvent.isConsumed(evt) &&
+                        cell != null &&
+                        this.isCellEditable(cell)) {
+                        if (this.model.isEdge(cell) ||
+                            !this.isHtmlLabel(cell)) {
+                            this.startEditingAtCell(cell);
+                        }
+                        else {
+                            var content = document.createElement('div');
+                            content.innerHTML = this.convertValueToString(cell);
+                            showModalWindow(this, 'Properties', content, 400, 300);
+                        }
+                    }
+
+                    // 禁用任何默认双击行为
+                    mxEvent.consume(evt);
+                };
+
+                // 启用新连接
+                graph.setConnectable(true);
+
+                // 配置样式
+                configureStylesheet(graph);
+
+                // 添加侧边栏图标
+                //
+                // NOTE: 如果不是HTML样式，可以通过另外一种方式添加:
+                // addSidebarIcon(graph, sidebar, 'Website', 'images/icons48/earth.png');
+                addSidebarIcon(graph, sidebar,
+                    '<h1 style="margin:0px;">Website</h1><br>' +
+                    '<img src="images/icons48/earth.png" width="48" height="48">' +
+                    '<br>' +
+                    '<a href="http://www.jgraph.com" target="_blank">Browse</a>',
+                    'images/icons48/earth.png');
+                addSidebarIcon(graph, sidebar,
+                    '<h1 style="margin:0px;">Process</h1><br>' +
+                    '<img src="images/icons48/gear.png" width="48" height="48">' +
+                    '<br><select><option>Value1</option><option>Value2</option></select><br>',
+                    'images/icons48/gear.png');
+                addSidebarIcon(graph, sidebar,
+                    '<h1 style="margin:0px;">Keys</h1><br>' +
+                    '<img src="images/icons48/keys.png" width="48" height="48">' +
+                    '<br>' +
+                    '<button onclick="mxUtils.alert(\'generate\');">Generate</button>',
+                    'images/icons48/keys.png');
+                addSidebarIcon(graph, sidebar,
+                    '<h1 style="margin:0px;">New Mail</h1><br>' +
+                    '<img src="images/icons48/mail_new.png" width="48" height="48">' +
+                    '<br><input type="checkbox"/>CC Archive',
+                    'images/icons48/mail_new.png');
+                addSidebarIcon(graph, sidebar,
+                    '<h1 style="margin:0px;">Server</h1><br>' +
+                    '<img src="images/icons48/server.png" width="48" height="48">' +
+                    '<br>' +
+                    '<a href="http://www.mxgraph.blogspot.com" target="_blank">Ping</a>',
+                    'images/icons48/server.png');
+
+                // 在一个半透明的窗口中显示提示图标。
+                var hints = document.createElement('div');
+                hints.style.position = 'absolute';
+                hints.style.overflow = 'hidden';
+                hints.style.width = '230px';
+                hints.style.bottom = '56px';
+                hints.style.height = '76px';
+                hints.style.right = '20px';
+
+                hints.style.background = 'black';
+                hints.style.color = 'white';
+                hints.style.fontFamily = 'Arial';
+                hints.style.fontSize = '10px';
+                hints.style.padding = '4px';
+
+                mxUtils.setOpacity(hints, 50);
+
+                mxUtils.writeln(hints, '- Drag an image from the sidebar to the graph');
+                mxUtils.writeln(hints, '- Doubleclick on a vertex or edge to edit');
+                mxUtils.writeln(hints, '- Shift- or Rightclick and drag for panning');
+                mxUtils.writeln(hints, '- Move the mouse over a cell to see a tooltip');
+                mxUtils.writeln(hints, '- Click and drag a vertex to move and connect');
+                document.body.appendChild(hints);
+
+                // 创建一个新的DIV容器作为一个工具栏，添加工具栏按钮。
+                var spacer = document.createElement('div');
+                spacer.style.display = 'inline';
+                spacer.style.padding = '8px';
+
+                addToolbarButton(editor, toolbar, 'groupOrUngroup', '(Un)group', 'images/group.png');
+
+                // Defines a new action for deleting or ungrouping
+                editor.addAction('groupOrUngroup', function (editor, cell) {
+                    cell = cell || editor.graph.getSelectionCell();
+                    if (cell != null && editor.graph.isSwimlane(cell)) {
+                        editor.execute('ungroup', cell);
+                    }
+                    else {
+                        editor.execute('group');
+                    }
+                });
+
+                addToolbarButton(editor, toolbar, 'delete', 'Delete', 'images/delete2.png');
+
+                toolbar.appendChild(spacer.cloneNode(true));
+
+                addToolbarButton(editor, toolbar, 'cut', 'Cut', 'images/cut.png');
+                addToolbarButton(editor, toolbar, 'copy', 'Copy', 'images/copy.png');
+                addToolbarButton(editor, toolbar, 'paste', 'Paste', 'images/paste.png');
+
+                toolbar.appendChild(spacer.cloneNode(true));
+
+                addToolbarButton(editor, toolbar, 'undo', '', 'images/undo.png');
+                addToolbarButton(editor, toolbar, 'redo', '', 'images/redo.png');
+
+                toolbar.appendChild(spacer.cloneNode(true));
+
+                addToolbarButton(editor, toolbar, 'show', 'Show', 'images/camera.png');
+                addToolbarButton(editor, toolbar, 'print', 'Print', 'images/printer.png');
+
+                toolbar.appendChild(spacer.cloneNode(true));
+
+                // 定义新的导出事件
+                editor.addAction('export', function (editor, cell) {
+                    var textarea = document.createElement('textarea');
+                    textarea.style.width = '400px';
+                    textarea.style.height = '400px';
+                    var enc = new mxCodec(mxUtils.createXmlDocument());
+                    var node = enc.encode(editor.graph.getModel());
+                    textarea.value = mxUtils.getPrettyXml(node);
+                    showModalWindow(graph, 'XML', textarea, 410, 440);
+                });
+
+                addToolbarButton(editor, toolbar, 'export', 'Export', 'images/export1.png');
+
+                // ---
+
+                // 在窗口底部的状态栏中添加工具栏按钮。
+                addToolbarButton(editor, status, 'collapseAll', 'Collapse All', 'images/navigate_minus.png', true);
+                addToolbarButton(editor, status, 'expandAll', 'Expand All', 'images/navigate_plus.png', true);
+
+                status.appendChild(spacer.cloneNode(true));
+
+                addToolbarButton(editor, status, 'enterGroup', 'Enter', 'images/view_next.png', true);
+                addToolbarButton(editor, status, 'exitGroup', 'Exit', 'images/view_previous.png', true);
+
+                status.appendChild(spacer.cloneNode(true));
+
+                addToolbarButton(editor, status, 'zoomIn', '', 'images/zoom_in.png', true);
+                addToolbarButton(editor, status, 'zoomOut', '', 'images/zoom_out.png', true);
+                addToolbarButton(editor, status, 'actualSize', '', 'images/view_1_1.png', true);
+                addToolbarButton(editor, status, 'fit', '', 'images/fit_to_size.png', true);
+
+                // 图形窗口的右上角的周围创建导航提示。
+                var outln = new mxOutline(graph, outline);
+
+                // 要显示的图像的轮廓，去掉下面的代码
+                //outln.outline.labelsVisible = true;
+                //outln.outline.setHtmlLabels(true);
+
+                // 淡出了启动后，屏幕的UI已经被加载
+                var splash = document.getElementById('splash');
+                if (splash != null) {
+                    try {
+                        mxEvent.release(splash);
+                        mxEffects.fadeOut(splash, 100, true);
+                    }
+                    catch (e) {
+
+                        // 工具库不可用（不加载库）
+                        splash.parentNode.removeChild(splash);
+                    }
+                }
+            }
+        };
+        // 添加工具栏按钮
+        function addToolbarButton(editor, toolbar, action, label, image, isTransparent) {
+            var button = document.createElement('button');
+            button.style.fontSize = '10';
+            if (image != null) {
+                var img = document.createElement('img');
+                img.setAttribute('src', image);
+                img.style.width = '16px';
+                img.style.height = '16px';
+                img.style.verticalAlign = 'middle';
+                img.style.marginRight = '2px';
+                button.appendChild(img);
+            }
+            if (isTransparent) {
+                button.style.background = 'transparent';
+                button.style.color = '#FFFFFF';
+                button.style.border = 'none';
+            }
+            mxEvent.addListener(button, 'click', function (evt) {
+                editor.execute(action);
+            });
+            mxUtils.write(button, label);
+            toolbar.appendChild(button);
+        };
+        // 显示静态窗口
+        function showModalWindow(graph, title, content, width, height) {
+            var background = document.createElement('div');
+            background.style.position = 'absolute';
+            background.style.left = '0px';
+            background.style.top = '0px';
+            background.style.right = '0px';
+            background.style.bottom = '0px';
+            background.style.background = 'black';
+            mxUtils.setOpacity(background, 50);
+            document.body.appendChild(background);
+
+            if (mxClient.IS_IE) {
+                new mxDivResizer(background);
+            }
+
+            var x = Math.max(0, document.body.scrollWidth / 2 - width / 2);
+            var y = Math.max(10, (document.body.scrollHeight ||
+                        document.documentElement.scrollHeight) / 2 - height * 2 / 3);
+            var wnd = new mxWindow(title, content, x, y, width, height, false, true);
+            wnd.setClosable(true);
+
+            // 窗口关闭后淡入背景
+            wnd.addListener(mxEvent.DESTROY, function (evt) {
+                graph.setEnabled(true);
+                mxEffects.fadeOut(background, 50, true,
+                    10, 30, true);
+            });
+
+            graph.setEnabled(false);
+            graph.tooltipHandler.hide();
+            wnd.setVisible(true);
+        };
+        // 添加边栏图标
+        function addSidebarIcon(graph, sidebar, label, image) {
+            // Function that is executed when the image is dropped on
+            // the graph. The cell argument points to the cell under
+            // the mousepointer if there is one.
+            var funct = function (graph, evt, cell, x, y) {
+                var parent = graph.getDefaultParent();
+                var model = graph.getModel();
+
+                var v1 = null;
+
+                model.beginUpdate();
+                try {
+                    // NOTE: For non-HTML labels the image must be displayed via the style
+                    // rather than the label markup, so use 'image=' + image for the style.
+                    // as follows: v1 = graph.insertVertex(parent, null, label,
+                    // pt.x, pt.y, 120, 120, 'image=' + image);
+                    v1 = graph.insertVertex(parent, null, label, x, y, 120, 120);
+                    v1.setConnectable(false);
+
+                    // 预置折叠的大小
+                    v1.geometry.alternateBounds = new mxRectangle(0, 0, 120, 40);
+
+                    // 在不同位置添加对应图标
+                    var port = graph.insertVertex(v1, null, 'Trigger', 0, 0.25, 16, 16,
+                            'port;image=editors/images/overlays/flash.png;align=right;imageAlign=right;spacingRight=18', true);
+                    port.geometry.offset = new mxPoint(-6, -8);
+
+                    var port = graph.insertVertex(v1, null, 'Input', 0, 0.75, 16, 16,
+                            'port;image=editors/images/overlays/check.png;align=right;imageAlign=right;spacingRight=18', true);
+                    port.geometry.offset = new mxPoint(-6, -4);
+
+                    var port = graph.insertVertex(v1, null, 'Error', 1, 0.25, 16, 16,
+                            'port;image=editors/images/overlays/error.png;spacingLeft=18', true);
+                    port.geometry.offset = new mxPoint(-8, -8);
+
+                    var port = graph.insertVertex(v1, null, 'Result', 1, 0.75, 16, 16,
+                            'port;image=editors/images/overlays/information.png;spacingLeft=18', true);
+                    port.geometry.offset = new mxPoint(-8, -4);
+                }
+                finally {
+                    model.endUpdate();
+                }
+
+                graph.setSelectionCell(v1);
+            }
+
+            // 创建用来拖动的侧边栏图标
+            var img = document.createElement('img');
+            img.setAttribute('src', image);
+            img.style.width = '48px';
+            img.style.height = '48px';
+            img.title = 'Drag this to the diagram to create a new vertex';
+            sidebar.appendChild(img);
+
+            var dragElt = document.createElement('div');
+            dragElt.style.border = 'dashed black 1px';
+            dragElt.style.width = '120px';
+            dragElt.style.height = '120px';
+
+            // 创建的图像，它被用作拖动图标（预览）
+            var ds = mxUtils.makeDraggable(img, graph, funct, dragElt, 0, 0, true, true);
+            ds.setGuidesEnabled(true);
+        };
+        // 配置样式
+        function configureStylesheet(graph) {
+            var style = new Object();
+            style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_RECTANGLE;
+            style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
+            style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_CENTER;
+            style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_MIDDLE;
+            style[mxConstants.STYLE_GRADIENTCOLOR] = '#41B9F5';
+            style[mxConstants.STYLE_FILLCOLOR] = '#8CCDF5';
+            style[mxConstants.STYLE_STROKECOLOR] = '#1B78C8';
+            style[mxConstants.STYLE_FONTCOLOR] = '#000000';
+            style[mxConstants.STYLE_ROUNDED] = true;
+            style[mxConstants.STYLE_OPACITY] = '80';
+            style[mxConstants.STYLE_FONTSIZE] = '12';
+            style[mxConstants.STYLE_FONTSTYLE] = 0;
+            style[mxConstants.STYLE_IMAGE_WIDTH] = '48';
+            style[mxConstants.STYLE_IMAGE_HEIGHT] = '48';
+            graph.getStylesheet().putDefaultVertexStyle(style);
+
+            // NOTE: 替换HTML标签上面的样式。
+            /*var style = new Object();
+            style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_LABEL;
+            style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
+            style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_TOP;
+            style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_CENTER;
+            style[mxConstants.STYLE_IMAGE_ALIGN] = mxConstants.ALIGN_CENTER;
+            style[mxConstants.STYLE_IMAGE_VERTICAL_ALIGN] = mxConstants.ALIGN_TOP;
+            style[mxConstants.STYLE_SPACING_TOP] = '56';
+            style[mxConstants.STYLE_GRADIENTCOLOR] = '#7d85df';
+            style[mxConstants.STYLE_STROKECOLOR] = '#5d65df';
+            style[mxConstants.STYLE_FILLCOLOR] = '#adc5ff';
+            style[mxConstants.STYLE_FONTCOLOR] = '#1d258f';
+            style[mxConstants.STYLE_FONTFAMILY] = 'Verdana';
+            style[mxConstants.STYLE_FONTSIZE] = '12';
+            style[mxConstants.STYLE_FONTSTYLE] = '1';
+            style[mxConstants.STYLE_ROUNDED] = '1';
+            style[mxConstants.STYLE_IMAGE_WIDTH] = '48';
+            style[mxConstants.STYLE_IMAGE_HEIGHT] = '48';
+            style[mxConstants.STYLE_OPACITY] = '80';
+            graph.getStylesheet().putDefaultVertexStyle(style);*/
+
+            style = new Object();
+            style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_SWIMLANE;
+            style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
+            style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_CENTER;
+            style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_TOP;
+            style[mxConstants.STYLE_FILLCOLOR] = '#FF9103';
+            style[mxConstants.STYLE_GRADIENTCOLOR] = '#F8C48B';
+            style[mxConstants.STYLE_STROKECOLOR] = '#E86A00';
+            style[mxConstants.STYLE_FONTCOLOR] = '#000000';
+            style[mxConstants.STYLE_ROUNDED] = true;
+            style[mxConstants.STYLE_OPACITY] = '80';
+            style[mxConstants.STYLE_STARTSIZE] = '30';
+            style[mxConstants.STYLE_FONTSIZE] = '16';
+            style[mxConstants.STYLE_FONTSTYLE] = 1;
+            graph.getStylesheet().putCellStyle('group', style);
+
+            style = new Object();
+            style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_IMAGE;
+            style[mxConstants.STYLE_FONTCOLOR] = '#774400';
+            style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
+            style[mxConstants.STYLE_PERIMETER_SPACING] = '6';
+            style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_LEFT;
+            style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_MIDDLE;
+            style[mxConstants.STYLE_FONTSIZE] = '10';
+            style[mxConstants.STYLE_FONTSTYLE] = 2;
+            style[mxConstants.STYLE_IMAGE_WIDTH] = '16';
+            style[mxConstants.STYLE_IMAGE_HEIGHT] = '16';
+            graph.getStylesheet().putCellStyle('port', style);
+
+            style = graph.getStylesheet().getDefaultEdgeStyle();
+            style[mxConstants.STYLE_LABEL_BACKGROUNDCOLOR] = '#FFFFFF';
+            style[mxConstants.STYLE_STROKEWIDTH] = '2';
+            style[mxConstants.STYLE_ROUNDED] = true;
+            style[mxConstants.STYLE_EDGE] = mxEdgeStyle.EntityRelation;
+        };
+    </script>
+</head>
+
+<!-- 页面载入时启动程序 -->
+<body onload="main(document.getElementById('graphContainer'),
+            document.getElementById('outlineContainer'),
+            document.getElementById('toolbarContainer'),
+            document.getElementById('sidebarContainer'),
+            document.getElementById('statusContainer'));" style="margin:0px;">
+
+    <!-- 创建容器的启动画面 -->
+    <div id="splash"
+         style="position:absolute;top:0px;left:0px;width:100%;height:100%;background:white;z-index:1;">
+        <center id="splash" style="padding-top:230px;">
+            <img src="editors/images/loading.gif">
+        </center>
+    </div>
+
+    <!-- 创建容器侧边栏 -->
+    <div id="toolbarContainer"
+         style="position:absolute;white-space:nowrap;overflow:hidden;top:0px;left:0px;max-height:24px;height:36px;right:0px;padding:6px;background-image:url('images/toolbar_bg.gif');">
+    </div>
+
+    <!-- 创建容器的工具箱 -->
+    <div id="sidebarContainer"
+         style="position:absolute;overflow:hidden;top:36px;left:0px;bottom:36px;max-width:52px;width:56px;padding-top:10px;padding-left:4px;background-image:url('images/sidebar_bg.gif');">
+    </div>
+
+    <!-- 创建图形容器-->
+    <div id="graphContainer"
+         style="position:absolute;overflow:hidden;top:36px;left:60px;bottom:36px;right:0px;background-image:url('editors/images/grid.gif');cursor:default;">
+    </div>
+
+    <!-- 创建导航框-->
+    <div id="outlineContainer"
+         style="position:absolute;overflow:hidden;top:36px;right:0px;width:200px;height:140px;background:transparent;border-style:solid;border-color:black;">
+    </div>
+
+    <!-- 创建容器状态栏 -->
+    <div id="statusContainer"
+         style="text-align:right;position:absolute;overflow:hidden;bottom:0px;left:0px;max-height:24px;height:36px;right:0px;color:white;padding:6px;background-image:url('images/toolbar_bg.gif');">
+        <div style="font-size:10pt;float:left;">
+            Created with <a href="http://www.jgraph.com" target="_blank">mxGraph</a>
+        </div>
+    </div>
+</body>
+</html>  
