@@ -337,9 +337,11 @@
     <Content Include="Content\skin.css" />
     <Content Include="editors\images\add.png" />
     <Content Include="editors\images\B.jpg" />
+    <Content Include="editors\images\buy1.png" />
     <Content Include="editors\images\C.jpg" />
     <Content Include="editors\images\camera.png" />
     <Content Include="editors\images\check.png" />
+    <Content Include="editors\images\CI1.png" />
     <Content Include="editors\images\close.png" />
     <Content Include="editors\images\connector.gif" />
     <Content Include="editors\images\copy.png" />
@@ -369,12 +371,15 @@
     <Content Include="editors\images\print32.png" />
     <Content Include="editors\images\redo.png" />
     <Content Include="editors\images\S.jpg" />
+    <Content Include="editors\images\sell.png" />
     <Content Include="editors\images\sidebar_bg.gif" />
     <Content Include="editors\images\spacer.gif" />
     <Content Include="editors\images\toolbar_bg.gif" />
     <Content Include="editors\images\U.jpg" />
+    <Content Include="editors\images\UI.png" />
     <Content Include="editors\images\undo.png" />
     <Content Include="editors\images\V.jpg" />
+    <Content Include="editors\images\VI.png" />
     <Content Include="editors\images\view_1_1.png" />
     <Content Include="editors\images\view_1_132.png" />
     <Content Include="editors\images\view_next.png" />
@@ -415,6 +420,7 @@
     <Content Include="Scripts\locale\zh_CN.js" />
     <Content Include="Scripts\miniui.js" />
     <Content Include="Scripts\pagertree.js" />
+    <Content Include="SetUnitInfo.html" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>

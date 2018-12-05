@@ -107,6 +107,30 @@
             container.style.bottom = '0px';
             container.style.background = 'url("editors/images/grid.gif")';
             container.style.overflow = 'auto';
+            /**********侧边栏**********/
+            // 创建工具栏容器
+            var tbContainer = document.createElement('div');
+            tbContainer.style.position = 'absolute';
+            tbContainer.style.overflow = 'hidden';
+            tbContainer.style.padding = '2px';
+            tbContainer.style.left = '0px';
+            tbContainer.style.top = '50px';
+            tbContainer.style.width = '24px';
+            tbContainer.style.bottom = '0px';
+
+            document.body.appendChild(tbContainer);
+
+            // 创建工具栏监听工具
+            var toolbar = new mxToolbar(tbContainer);
+            toolbar.enabled = false
+            // 解决IE浏览器忽略的样式
+            if (mxClient.IS_QUIRKS) {
+                document.body.style.overflow = 'hidden';
+                new mxDivResizer(tbContainer);
+                new mxDivResizer(container);
+            }
+
+            /************END侧边栏****************/
             //创建一个画板
             var graph = new mxGraph(container);
             // 禁用浏览器自带右键菜单
@@ -134,24 +158,30 @@
             graph.getStylesheet().putCellStyle("style1", style);
             /*禁用节点双击，防止改变数据 */
             graph.dblClick = function (evt, cell) {
-                mini.open({
-                    targetWindow: window,
-                    url: "http://www.baidu.com",
-                    title: "编辑数据", width: 600, height: 400,
-                    onload: function () {
-                        var iframe = this.getIFrameEl();
-                        var data = { action: "new" };
-                        iframe.contentWindow.SetData(data);
-                    },
-                    ondestroy: function (action) {
-                        //grid.reload();
-                    }
-                });
-
-                //var model = graph.getModel();
-                //if (model.isVertex(cell)) {
-                //    return false;
-                //}
+                if (cell.vertex == true && cell.geometry.width > 0 && cell.geometry.height > 0) {
+                    mini.open({
+                        targetWindow: window,
+                        url: "SetUnitInfo.html",
+                        title: "装置信息设置", width: 600, height: 400,
+                        onload: function () {
+                        },
+                        ondestroy: function (action) {
+                            MatialIn(graph, cell);
+                            MatialOut(graph, cell);
+                        }
+                    });
+                }
+                if (cell.edge == true ) {
+                    mini.open({
+                        targetWindow: window,
+                        url: "HtmlPage1.html",
+                        title: "物料跟踪图", width: 600, height: 600,
+                        onload: function () {
+                        },
+                        ondestroy: function (action) {                         
+                        }
+                    });
+                }
             };
             //单击监听事件
             graph.addListener(mxEvent.CLICK, function (sender, evt) {
@@ -159,11 +189,21 @@
                 var cell = evt.getProperty('cell'); // cell may be null
 
                 if (cell != null) {
-                    evt.consume();
+                    evt.consume();                    
                     $("#t1").val(cell.value);
+                    if (cell.edge == true) {
+                        var a = graph.getModel().getCell(2);
+                        graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, "#B43104", [a]);
+                    }
+                    else {
+                        var a = graph.getModel().getCell(2);
+                        graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, "#999999", [a]);
+                    }
                 }
                 else {
                     $("#t1").val("");
+                    var a = graph.getModel().getCell(2);
+                    graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, "#999999", [a]);
                 }
             });
             //移动监听
@@ -172,10 +212,12 @@
                 var cells = evt.getProperty('cells'); // cell may be null
                 if (cells != null) {
                     evt.consume();
-                    if (cells[0].edge != true && cells[0].geometry.width > 0) {
-                        RefreshEdgeIn(graph, cells[0]);
-                        RefreshEdgeOut(graph, cells[0]);
-                    }
+                    for (var i = 0; i < cells.length; i++) {
+                        if (cells[i].edge != true && cells[i].geometry.width > 0 && cells[i].geometry.height > 0) {
+                            RefreshEdgeIn(graph, cells[i]);
+                            RefreshEdgeOut(graph, cells[i]);
+                        }
+                    }                   
                 }
             });
             //通过鼠标悬停事件禁止拖动线
@@ -220,7 +262,7 @@
                     graph.setCellsLocked(true);
                 }
             });
-            //调整大小监听
+            //调整改变大小监听
             graph.addListener(mxEvent.CELLS_RESIZED, function (sender, evt) {
                 /*重新绘制进出料位置*/
                 var cells = evt.getProperty('cells');
@@ -424,6 +466,12 @@
                     graph.removeSelectionCells(cells);
                 }
             }));
+            var addVertex = function (icon, type) {
+                addToolbarItem(graph, toolbar, type, icon);
+            };
+
+            addVertex('editors/images/CI1.png', 'C');
+            addVertex('editors/images/VI.png', 'V');
             function GetRandomNum(Min, Max) {
                 var Range = Max - Min;
                 var Rand = Math.random();
@@ -437,7 +485,7 @@
             // 在一个步骤中，加入所有的单元到模型中
             graph.getModel().beginUpdate();
             try {
-                var e1 = graph.insertEdge(parent, null, 'to', v1, cell, "entryX=0;entryY=0.5;verticalAlign=bottom;");
+                var e1 = graph.insertEdge(parent, null, '进料·······0.00·······100%', v1, cell, "entryX=0;entryY=0.5;verticalAlign=bottom;");
             }
             finally {
                 // 更新显示
@@ -481,7 +529,7 @@
             // 在一个步骤中，加入所有的单元到模型中
             graph.getModel().beginUpdate();
             try {
-                var e1 = graph.insertEdge(parent, null, 'to', cell, v1, "exitX=1;exitY=0.5;verticalAlign=bottom;");
+                var e1 = graph.insertEdge(parent, null, '出料·······0.00·······100%', cell, v1, "exitX=1;exitY=0.5;verticalAlign=bottom;");
 
             }
             finally {
@@ -585,6 +633,17 @@
             var doc = mxUtils.parseXml(xml);
             var codec = new mxCodec(doc);
             codec.decode(doc.documentElement, graph.getModel());
+        }
+        function addToolbarItem(graph, toolbar, type, image) {
+            // 添加功能
+            var funct = function (graph, evt, cell) {
+                var pt = graph.getPointForEvent(evt);
+                AddUnit(graph, pt.x, pt.y, type);
+            }
+
+            // 创建拖动预览图标
+            var img = toolbar.addMode(null, image, funct);
+            mxUtils.makeDraggable(img, graph, funct);
         }
     </script>
 </head>
