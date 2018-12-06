@@ -86,8 +86,6 @@
         style[mxConstants.STYLE_IMAGE_ALIGN] = mxConstants.ALIGN_CENTER;
         // 底图垂直对齐
         style[mxConstants.STYLE_IMAGE_VERTICAL_ALIGN] = mxConstants.ALIGN_CENTER;
-        // 图片路径
-        //style[mxConstants.STYLE_IMAGE] = 'editors/images/C.jpg';
         // 背景图片宽
         style[mxConstants.STYLE_IMAGE_WIDTH] = 35;
         // 背景图片高
@@ -98,7 +96,6 @@
         // 四边间距设置
         style[mxConstants.STYLE_SPACING] = 10;
         window.onload = function () {
-            var outline = document.getElementById('outlineContainer');
             var container = document.getElementById("main");
             container.style.position = 'absolute';
             container.style.overflow = 'hidden';
@@ -108,528 +105,49 @@
             container.style.bottom = '0px';
             container.style.background = 'url("editors/images/grid.gif")';
             container.style.overflow = 'auto';
-            var wnd = new mxWindow('Scrollable, resizable, given height', container, 50, 50, 500, 500, true, true);
-            /**********侧边栏**********/
-            // 创建工具栏容器
-            var tbContainer = document.createElement('div');
-            tbContainer.style.position = 'absolute';
-            tbContainer.style.overflow = 'hidden';
-            tbContainer.style.padding = '2px';
-            tbContainer.style.left = '0px';
-            tbContainer.style.top = '50px';
-            tbContainer.style.width = '24px';
-            tbContainer.style.bottom = '0px';
-
-            document.body.appendChild(tbContainer);
-
-            // 创建工具栏监听工具
-            var toolbar = new mxToolbar(tbContainer);
-            toolbar.enabled = false
             // 解决IE浏览器忽略的样式
             if (mxClient.IS_QUIRKS) {
                 document.body.style.overflow = 'hidden';
-                new mxDivResizer(tbContainer);
                 new mxDivResizer(container);
-                new mxDivResizer(outline);
             }
+            var wnd;
+            var x = 50;
+            var y = 50;
+            var objGraph = new Array();
 
-            /************END侧边栏****************/
-            //创建一个画板
-            var graph = new mxGraph(container);
-            // 禁用浏览器自带右键菜单
-            mxEvent.disableContextMenu(document.body);
-            // 去锯齿效果
-            mxRectangleShape.prototype.crisp = true;
-            // 创建下拉菜单
-            new mxRubberband(graph);
-            graph.setCellsResizable(true); //节点可改变大小
-            mxGraphHandler.prototype.setMoveEnabled(false); //是否可以移动
-            mxGraphHandler.prototype.guidesEnabled = false; //显示细胞位置标尺
-            graph.setEnabled(true);//是否允许编辑
-            graph.setCellsLocked(true);//是否可以移动连线，重新连接其他cell，主要用来展现中用
-            graph.setConnectable(false); // 是否允许Cells通过其中部的连接点新建连接,false则通过连接线连接
-            // 节点是否解析html
-            graph.setHtmlLabels(true);
-            // 开启提示
-            graph.setTooltips(true);
-            // 关闭方块上的文字编辑功能
-            graph.setCellsEditable(false);
-            //获取顶层，可以认为是父节点
-            new mxCellTracker(graph);
-            var parent = graph.getDefaultParent();
-            // 把定义好的样式object push到stylesheet
-            graph.getStylesheet().putCellStyle("style1", style);
-            /*禁用节点双击，防止改变数据 */
-            graph.dblClick = function (evt, cell) {
-                if (cell.vertex == true && cell.geometry.width > 0 && cell.geometry.height > 0) {
-                    mini.open({
-                        targetWindow: window,
-                        url: "SetUnitInfo.html",
-                        title: "装置信息设置", width: 600, height: 400,
-                        onload: function () {
-                        },
-                        ondestroy: function (action) {
-                            MatialIn(graph, cell);
-                            MatialOut(graph, cell);
-                        }
-                    });
-                }
-                if (cell.edge == true) {
-                    mini.open({
-                        targetWindow: window,
-                        url: "HtmlPage1.html",
-                        title: "物料跟踪图", width: 600, height: 600,
-                        onload: function () {
-                        },
-                        ondestroy: function (action) {
-                        }
-                    });
-                }
-            };
-            //单击监听事件
-            graph.addListener(mxEvent.CLICK, function (sender, evt) {
-                var e = evt.getProperty('event'); // mouse event
-                var cell = evt.getProperty('cell'); // cell may be null          
-                if (cell != null) {
-                    evt.consume();
-                    $("#t1").val(cell.value);
-                    if (cell.edge == true) {
-                        var a = graph.getModel().getCell(2);
-                        graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, "#B43104", [a]);
-                    }
-                    else {
-                        var a = graph.getModel().getCell(2);
-                        graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, "#999999", [a]);
-                    }
-                }
-                else {
-                    $("#t1").val("");
-                    var a = graph.getModel().getCell(2);
-                    graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, "#999999", [a]);
-                }
-            });
-            //移动监听
-            graph.addListener(mxEvent.MOVE_CELLS, function (sender, evt) {
-                var e = evt.getProperty('event'); // mouse event
-                var cells = evt.getProperty('cells'); // cell may be null
-                if (cells != null) {
-                    evt.consume();
-                    for (var i = 0; i < cells.length; i++) {
-                        if (cells[i].edge != true && cells[i].geometry.width > 0 && cells[i].geometry.height > 0) {
-                            RefreshEdgeIn(graph, cells[i]);
-                            RefreshEdgeOut(graph, cells[i]);
-                        }
-                    }
-                }
-            });
-            //通过鼠标悬停事件禁止拖动线
-            graph.addMouseListener(
-            {
-                currentState: null,
-                previousStyle: null,
-                mouseDown: function (sender, me) {
-                },
-                mouseMove: function (sender, me) {
-                    if (this.currentState != null && me.getState() == this.currentState) {
-                        return;
-                    }
-
-                    var tmp = graph.view.getState(me.getCell());
-
-                    // Ignores everything but vertices
-                    if (graph.isMouseDown || (tmp != null && !
-                        graph.getModel().isVertex(tmp.cell))) {
-                        tmp = null;
-                    }
-
-                    if (tmp != this.currentState) {
-                        if (this.currentState != null) {
-                            this.dragLeave(me.getEvent(), this.currentState);
-                        }
-
-                        this.currentState = tmp;
-
-                        if (this.currentState != null) {
-                            this.dragEnter(me.getEvent(), this.currentState);
-                        }
-                    }
-                },
-                mouseUp: function (sender, me) { },
-                dragEnter: function (evt, state) {
-                    mxGraphHandler.prototype.setMoveEnabled(true);
-                    graph.setCellsLocked(false);
-                },
-                dragLeave: function (evt, state) {
-                    mxGraphHandler.prototype.setMoveEnabled(false);
-                    graph.setCellsLocked(true);
-                }
-            });
-            //调整改变大小监听
-            graph.addListener(mxEvent.CELLS_RESIZED, function (sender, evt) {
-                /*重新绘制进出料位置*/
-                var cells = evt.getProperty('cells');
-                if (cells != null) {
-                    for (var i = 0; i < cells.length; i++) {
-                        /*修改样式*/
-                        RefreshEdgeIn(graph, cells[i]);
-                        RefreshEdgeOut(graph, cells[i]);
-                        graph.setCellStyles(mxConstants.STYLE_IMAGE_WIDTH, cells[i].geometry.width, [cells[i]]);
-                        graph.setCellStyles(mxConstants.STYLE_IMAGE_HEIGHT, cells[i].geometry.height, [cells[i]]);
-                        if (graph.getModel().getChildCount(cells[i]) > 0) {
-                            var geo = graph.getCellGeometry(cells[i]);
-
-                            if (geo != null) {
-                                var children = graph.getChildCells(cells[i], true, true);
-                                var bounds = graph.getBoundingBoxFromGeometry(children, true);
-
-                                geo = geo.clone();
-                                geo.width = Math.max(geo.width, bounds.width);
-                                geo.height = Math.max(geo.height, bounds.height);
-
-                                graph.getModel().setGeometry(cells[i], geo);
-                            }
-                        }
-                    }
-                }
-            });
-            // 覆写右键单击事件
-            graph.popupMenuHandler.factoryMethod = function (menu, cell, evt) {
-                createPopupMenu(graph, menu, cell, evt);
-            };
-            //‘撤销’监听
-            var undoMng = new mxUndoManager();
-            var listener = function (sender, evt) {
-                undoMng.undoableEditHappened(evt.getProperty('edit'));
-            };
-            graph.getModel().addListener(mxEvent.UNDO, listener);
-            graph.getView().addListener(mxEvent.UNDO, listener);
-            // 设置自动扩大鼠标悬停
-            graph.panningHandler.autoExpand = true;
-            var span = document.createElement("span");
-            span.innerHTML = "值：";
-            document.body.appendChild(span);
-            var t1 = document.createElement("input");
-            t1.type = "text";
-            t1.id = "t1";
-            document.body.appendChild(t1);
-            // 提交
-            document.body.appendChild(mxUtils.button('提交', function (evt) {
-                if (graph.getSelectionCells().length != 1) {
-                    mxUtils.alert("请选择一个装置");
-                }
-                var cell = graph.getSelectionCells()[0];
-                SubmitData(graph, cell);
-            }));
-            document.body.appendChild(mxUtils.button('导入', function (evt) {
-                Import(graph);
-            }));
-            //删除选中Cell或者Edge
-            var keyHandler = new mxKeyHandler(graph);
-            keyHandler.bindKey(46, function (evt) {
-                if (graph.isEnabled()) {
-                    graph.removeCells();
-                }
-            });
-            // 居中缩放
-            graph.centerZoom = true;
-            // 放大按钮
-            document.body.appendChild(mxUtils.button('放大 +', function (evt) {
-                graph.zoomIn();
-            }));
-            // 缩小按钮
-            document.body.appendChild(mxUtils.button('缩小 -', function (evt) {
-                graph.zoomOut();
-            }));
-            // 还原按钮
-            document.body.appendChild(mxUtils.button('还原 #', function (evt) {
-                graph.zoomActual();
-                graph.zoomFactor = 1.2;
-                input.value = 1.2;
-            }));
-            var input = document.createElement("input");
-            input.type = "text";
-            input.value = graph.zoomFactor;
-            input.style = "width:50px";
-            input.addEventListener("blur", function () {
-                graph.zoomFactor = parseFloat(this.value, 10);
-            });
-            document.body.appendChild(input);
-            // 打印
-            document.body.appendChild(mxUtils.button('打印', function (evt) {
-                mxUtils.printScreen(graph);
-            }));
-            document.body.appendChild(mxUtils.button('复制', function (evt) {
-                var cells = new Array();
-                cells = graph.getSelectionCells();
-                mxClipboard.copy(graph, cells);
-            }));
-            document.body.appendChild(mxUtils.button('剪贴', function (evt) {
-                var cells = new Array();
-                cells = graph.getSelectionCells();
-                mxClipboard.cut(graph, cells);
-            }));
-            document.body.appendChild(mxUtils.button('粘贴', function (evt) {
-                mxClipboard.paste(graph);
-            }));
-            document.body.appendChild(mxUtils.button('删除', function (evt) {
-                var cells = new Array();
-                cells = graph.getSelectionCells();
-                for (var i = 0; i < cells.length; i++) {
-                    if (cells[i].geometry.height > 0) {
-                        var EdgeCount = cells[i].edges == null ? 0 : cells[i].edges.length;
-                        for (var j = 0; j < EdgeCount; j++) {
-                            if (cells[i].edges[0].target == cells[i]) {
-                                var CellArray = [cells[i].edges[0].source];
-                                mxClipboard.removeCells(graph, CellArray);
-                            }
-                            else if (cells[i].edges[0].source == cells[i]) {
-                                var CellArray = [cells[i].edges[0].target];
-                                mxClipboard.removeCells(graph, CellArray);
-                            }
-                        }
-                        mxClipboard.removeCells(graph, [cells[i]]);
-                    }
-                }
-
-            }));
-            document.body.appendChild(mxUtils.button('Undo', function () {
-                undoMng.undo();
-            }));
-
-            document.body.appendChild(mxUtils.button('Redo', function () {
-                undoMng.redo();
-            }));
-            document.body.appendChild(mxUtils.button('刷新', function (evt) {
-                RefreshModel(graph);
-            }));
-
-            document.body.appendChild(mxUtils.button('View XML', function () {
-                var encoder = new mxCodec();
-                var node = encoder.encode(graph.getModel());
-                mxUtils.popup(mxUtils.getPrettyXml(node), true);   //以窗口的方式展示处理
-            }));
             document.body.appendChild(mxUtils.button('计算', function () {
                 var message = "计算完成";
                 mxUtils.popup(message, true);   //以窗口的方式展示处理
             }));
-            document.body.appendChild(mxUtils.button('新建流程图', function () {                
-                var content = document.createElement('div');              
-
-                wnd = new mxWindow('Scrollable, resizable, auto height', content, 300, 500, 500, null, true, true);
-                //创建一个画板
-                var graph = new mxGraph(content);
-                // 禁用浏览器自带右键菜单
-                mxEvent.disableContextMenu(document.body);
-                // 去锯齿效果
-                mxRectangleShape.prototype.crisp = true;
-                // 创建下拉菜单
-                new mxRubberband(graph);
-                graph.setCellsResizable(true); //节点可改变大小
-                mxGraphHandler.prototype.setMoveEnabled(false); //是否可以移动
-                mxGraphHandler.prototype.guidesEnabled = false; //显示细胞位置标尺
-                graph.setEnabled(true);//是否允许编辑
-                graph.setCellsLocked(true);//是否可以移动连线，重新连接其他cell，主要用来展现中用
-                graph.setConnectable(false); // 是否允许Cells通过其中部的连接点新建连接,false则通过连接线连接
-                // 节点是否解析html
-                graph.setHtmlLabels(true);
-                // 开启提示
-                graph.setTooltips(true);
-                // 关闭方块上的文字编辑功能
-                graph.setCellsEditable(false);
-                //获取顶层，可以认为是父节点
-                new mxCellTracker(graph);
-                var parent = graph.getDefaultParent();
-                // 把定义好的样式object push到stylesheet
-                graph.getStylesheet().putCellStyle("style1", style);
-                /*禁用节点双击，防止改变数据 */
-                graph.dblClick = function (evt, cell) {
-                    if (cell.vertex == true && cell.geometry.width > 0 && cell.geometry.height > 0) {
-                        mini.open({
-                            targetWindow: window,
-                            url: "SetUnitInfo.html",
-                            title: "装置信息设置", width: 600, height: 400,
-                            onload: function () {
-                            },
-                            ondestroy: function (action) {
-                                MatialIn(graph, cell);
-                                MatialOut(graph, cell);
-                            }
-                        });
-                    }
-                    if (cell.edge == true) {
-                        mini.open({
-                            targetWindow: window,
-                            url: "HtmlPage1.html",
-                            title: "物料跟踪图", width: 600, height: 600,
-                            onload: function () {
-                            },
-                            ondestroy: function (action) {
-                            }
-                        });
-                    }
-                };
-                //单击监听事件
-                graph.addListener(mxEvent.CLICK, function (sender, evt) {
-                    var e = evt.getProperty('event'); // mouse event
-                    var cell = evt.getProperty('cell'); // cell may be null
-
-                    if (cell != null) {
-                        evt.consume();
-                        $("#t1").val(cell.value);
-                        if (cell.edge == true) {
-                            var a = graph.getModel().getCell(2);
-                            graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, "#B43104", [a]);
-                        }
-                        else {
-                            var a = graph.getModel().getCell(2);
-                            graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, "#999999", [a]);
-                        }
-                    }
-                    else {
-                        $("#t1").val("");
-                        var a = graph.getModel().getCell(2);
-                        graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, "#999999", [a]);
-                    }
-                });
-                //移动监听
-                graph.addListener(mxEvent.MOVE_CELLS, function (sender, evt) {
-                    var e = evt.getProperty('event'); // mouse event
-                    var cells = evt.getProperty('cells'); // cell may be null
-                    if (cells != null) {
-                        evt.consume();
-                        for (var i = 0; i < cells.length; i++) {
-                            if (cells[i].edge != true && cells[i].geometry.width > 0 && cells[i].geometry.height > 0) {
-                                RefreshEdgeIn(graph, cells[i]);
-                                RefreshEdgeOut(graph, cells[i]);
-                            }
-                        }
-                    }
-                });
-                //通过鼠标悬停事件禁止拖动线
-                graph.addMouseListener(
-                {
-                    currentState: null,
-                    previousStyle: null,
-                    mouseDown: function (sender, me) {
-                    },
-                    mouseMove: function (sender, me) {
-                        if (this.currentState != null && me.getState() == this.currentState) {
-                            return;
-                        }
-
-                        var tmp = graph.view.getState(me.getCell());
-
-                        // Ignores everything but vertices
-                        if (graph.isMouseDown || (tmp != null && !
-                            graph.getModel().isVertex(tmp.cell))) {
-                            tmp = null;
-                        }
-
-                        if (tmp != this.currentState) {
-                            if (this.currentState != null) {
-                                this.dragLeave(me.getEvent(), this.currentState);
-                            }
-
-                            this.currentState = tmp;
-
-                            if (this.currentState != null) {
-                                this.dragEnter(me.getEvent(), this.currentState);
-                            }
-                        }
-                    },
-                    mouseUp: function (sender, me) { },
-                    dragEnter: function (evt, state) {
-                        mxGraphHandler.prototype.setMoveEnabled(true);
-                        graph.setCellsLocked(false);
-                    },
-                    dragLeave: function (evt, state) {
-                        mxGraphHandler.prototype.setMoveEnabled(false);
-                        graph.setCellsLocked(true);
-                    }
-                });
-                //调整改变大小监听
-                graph.addListener(mxEvent.CELLS_RESIZED, function (sender, evt) {
-                    /*重新绘制进出料位置*/
-                    var cells = evt.getProperty('cells');
-                    if (cells != null) {
-                        for (var i = 0; i < cells.length; i++) {
-                            /*修改样式*/
-                            RefreshEdgeIn(graph, cells[i]);
-                            RefreshEdgeOut(graph, cells[i]);
-                            graph.setCellStyles(mxConstants.STYLE_IMAGE_WIDTH, cells[i].geometry.width, [cells[i]]);
-                            graph.setCellStyles(mxConstants.STYLE_IMAGE_HEIGHT, cells[i].geometry.height, [cells[i]]);
-                            if (graph.getModel().getChildCount(cells[i]) > 0) {
-                                var geo = graph.getCellGeometry(cells[i]);
-
-                                if (geo != null) {
-                                    var children = graph.getChildCells(cells[i], true, true);
-                                    var bounds = graph.getBoundingBoxFromGeometry(children, true);
-
-                                    geo = geo.clone();
-                                    geo.width = Math.max(geo.width, bounds.width);
-                                    geo.height = Math.max(geo.height, bounds.height);
-
-                                    graph.getModel().setGeometry(cells[i], geo);
-                                }
-                            }
-                        }
-                    }
-                });
-                // 覆写右键单击事件
-                graph.popupMenuHandler.factoryMethod = function (menu, cell, evt) {
-                    createPopupMenu(graph, menu, cell, evt);
-                };
-                //‘撤销’监听
-                var undoMng = new mxUndoManager();
-                var listener = function (sender, evt) {
-                    undoMng.undoableEditHappened(evt.getProperty('edit'));
-                };
-                graph.getModel().addListener(mxEvent.UNDO, listener);
-                graph.getView().addListener(mxEvent.UNDO, listener);
-                // 设置自动扩大鼠标悬停
-                graph.panningHandler.autoExpand = true;
-                wnd.setMaximizable(true);
-                wnd.setScrollable(true);
-                wnd.setResizable(true);
-                wnd.setVisible(true);
+            document.body.appendChild(mxUtils.button('显示', function () {
+                objGraph[0].wnd.setVisible(true);
             }));
-            document.body.appendChild(mxUtils.button('整理', function (evt) {
-                graph.selectAll();
-                var cells = new Array();
-                cells = graph.getSelectionCells();
-                var NX = 250;
-                var NY = 50;
-                var ColCount = 0;
-                if (cells != null) {
-                    for (var i = 0; i < cells.length; i++) {
-                        //节点大小为0的不参与整理
-                        if (cells[i].geometry.height > 0) {
-                            var CellArray = [cells[i]];
-                            var OY = CellArray[0].geometry.y;
-                            var OX = CellArray[0].geometry.x;
-                            graph.moveCells(CellArray, NX - OX, NY - OY);
-                            NX = NX + 450;
-                            ColCount++;
-                            if (ColCount >= 3) {
-                                NY = NY + 430;
-                                ColCount = 0;
-                                NX = 250;
-                            }
-                        }
+            document.body.appendChild(mxUtils.button('隐藏', function () {
+                objGraph[0].wnd.setVisible(false);
+            }));
+            var lctName = document.createElement("input");
+            lctName.type = "text";
+            lctName.id = "lctName";
+            lctName.value = "模型图";
+            document.body.appendChild(lctName);
+            objGraph.push(addWindow(document.getElementById("lctName").value, wnd, container, x, y));
+            document.body.appendChild(mxUtils.button('新建流程图', function () {
+                for (var i = 0; i < objGraph.length; i++) {
+                    if (objGraph[i].wnd.title.innerText == document.getElementById("lctName").value) {
+                        alert("模型图名称已存在！");
+                        return;
                     }
-                    graph.removeSelectionCells(cells);
                 }
-            }));
-            /***********左侧装置栏************/
-            addToolbarItem(graph, toolbar, 'C', 'editors/images/CI1.png');
-            addToolbarItem(graph, toolbar, 'V', 'editors/images/VI.png');
-            // 图形窗口的右上角的周围创建导航提示。
-            var outln = new mxOutline(graph, outline);
-            wnd.setMaximizable(true);
-            wnd.setResizable(true);
-            wnd.setVisible(true);
-            mxLog.show();
+                var content = document.createElement('div');
+                objGraph.push(addWindow(document.getElementById("lctName").value, wnd, content, x, y));
+                moldelWindowSelect(objGraph);
 
+            }));
+            var lct = document.createElement("select");
+            lct.id = "lct";
+            document.body.appendChild(lct);
+            moldelWindowSelect(objGraph);
+            RefreshButton(objGraph[0].graph, toolbar);
         }
         function MatialIn(graph, cell) {
             var parent = graph.getDefaultParent();
@@ -797,17 +315,445 @@
             var img = toolbar.addMode(null, image, funct);
             mxUtils.makeDraggable(img, graph, funct);
         }
+        //创建按钮
+        function RefreshButton(graph, toolbar) {
+            var span = document.createElement("span");
+            span.innerHTML = "值：";
+            span.id = "s1";
+            delRow(span.id);
+            document.body.appendChild(span);
+            var t1 = document.createElement("input");
+            t1.type = "text";
+            t1.id = "t1";
+            delRow(t1.id);
+            document.body.appendChild(t1);
+            // 提交
+            var tj = mxUtils.button('提交', function (evt) {
+                if (graph.getSelectionCells().length != 1) {
+                    mxUtils.alert("请选择一个装置");
+                }
+                var cell = graph.getSelectionCells()[0];
+                SubmitData(graph, cell);
+            })
+            tj.id = "tj";
+            delRow(tj.id);
+            document.body.appendChild(tj);
+            var dr = mxUtils.button('导入', function (evt) {
+                Import(graph);
+            });
+            dr.id = "dr";
+            delRow(dr.id);
+            document.body.appendChild(dr);
+
+            // 放大按钮
+            var fd = mxUtils.button('放大 +', function (evt) {
+                graph.zoomIn();
+            });
+            fd.id = "fd";
+            delRow(fd.id);
+            document.body.appendChild(fd);
+            // 缩小按钮
+            var suox = mxUtils.button('缩小 -', function (evt) {
+                graph.zoomOut();
+            });
+            suox.id = "suox";
+            delRow(suox.id);
+            document.body.appendChild(suox);
+            // 还原按钮
+            var hy = mxUtils.button('还原 #', function (evt) {
+                graph.zoomActual();
+                graph.zoomFactor = 1.2;
+                input.value = 1.2;
+            });
+            hy.id = "hy";
+            delRow(hy.id);
+            document.body.appendChild(hy);
+            var input = document.createElement("sfbs");//缩放倍数
+            input.type = "text";
+            input.value = graph.zoomFactor;
+            input.style = "width:50px";
+            input.addEventListener("blur", function () {
+                graph.zoomFactor = parseFloat(this.value, 10);
+            });
+            input.id = "sfbs";
+            delRow(input.id);
+            document.body.appendChild(input);
+            // 打印
+            var dy = mxUtils.button('打印', function (evt) {
+                mxUtils.printScreen(graph);
+            });
+            dy.id = "dy";
+            delRow(dy.id);
+            document.body.appendChild(dy);
+            var fz = mxUtils.button('复制', function (evt) {
+                var cells = new Array();
+                cells = graph.getSelectionCells();
+                mxClipboard.copy(graph, cells);
+            });
+            fz.id = "fz";
+            delRow(fz.id);
+            document.body.appendChild(fz);
+            var jt = mxUtils.button('剪贴', function (evt) {
+                var cells = new Array();
+                cells = graph.getSelectionCells();
+                mxClipboard.cut(graph, cells);
+            });
+            jt.id = "jt";
+            delRow(jt.id);
+            document.body.appendChild(jt);
+            var zt = mxUtils.button('粘贴', function (evt) {
+                mxClipboard.paste(graph);
+            });
+            zt.id = "zt";
+            delRow(zt.id);
+            document.body.appendChild(zt);
+            var sc = mxUtils.button('删除', function (evt) {
+                var cells = new Array();
+                cells = graph.getSelectionCells();
+                for (var i = 0; i < cells.length; i++) {
+                    if (cells[i].geometry.height > 0) {
+                        var EdgeCount = cells[i].edges == null ? 0 : cells[i].edges.length;
+                        for (var j = 0; j < EdgeCount; j++) {
+                            if (cells[i].edges[0].target == cells[i]) {
+                                var CellArray = [cells[i].edges[0].source];
+                                mxClipboard.removeCells(graph, CellArray);
+                            }
+                            else if (cells[i].edges[0].source == cells[i]) {
+                                var CellArray = [cells[i].edges[0].target];
+                                mxClipboard.removeCells(graph, CellArray);
+                            }
+                        }
+                        mxClipboard.removeCells(graph, [cells[i]]);
+                    }
+                }
+
+            });
+            sc.id = "sc";
+            delRow(sc.id);
+            document.body.appendChild(sc);
+            var cx = mxUtils.button('Undo', function () {
+                undoMng.undo();
+            });
+            cx.id = "cx";
+            delRow(cx.id);
+            document.body.appendChild(cx);
+            var fcx = mxUtils.button('Redo', function () {
+                undoMng.redo();
+            });
+            fcx.id = "fcx";
+            delRow(fcx.id);
+            document.body.appendChild(fcx);
+            var sx = mxUtils.button('刷新', function (evt) {
+                RefreshModel(graph);
+            });
+            sx.id = "sx";
+            delRow(sx.id);
+            document.body.appendChild(sx);
+            var xsxml = mxUtils.button('View XML', function () {
+                var encoder = new mxCodec();
+                var node = encoder.encode(graph.getModel());
+                mxUtils.popup(mxUtils.getPrettyXml(node), true);   //以窗口的方式展示处理
+            });
+            xsxml.id = "xsxml";
+            delRow(xsxml.id);
+            document.body.appendChild(xsxml);
+            var zl = mxUtils.button('整理', function (evt) {
+                graph.selectAll();
+                var cells = new Array();
+                cells = graph.getSelectionCells();
+                var NX = 250;
+                var NY = 50;
+                var ColCount = 0;
+                if (cells != null) {
+                    for (var i = 0; i < cells.length; i++) {
+                        //节点大小为0的不参与整理
+                        if (cells[i].geometry.height > 0) {
+                            var CellArray = [cells[i]];
+                            var OY = CellArray[0].geometry.y;
+                            var OX = CellArray[0].geometry.x;
+                            graph.moveCells(CellArray, NX - OX, NY - OY);
+                            NX = NX + 450;
+                            ColCount++;
+                            if (ColCount >= 2) {
+                                NY = NY + 430;
+                                ColCount = 0;
+                                NX = 250;
+                            }
+                        }
+                    }
+                    graph.removeSelectionCells(cells);
+                }
+            });
+            zl.id = "zl";
+            delRow(zl.id);
+            document.body.appendChild(zl);
+            /***********左侧装置栏************/
+            var tbContainer = document.createElement('div');
+            tbContainer.id = "gjl";
+            tbContainer.style.position = 'absolute';
+            tbContainer.style.overflow = 'hidden';
+            tbContainer.style.padding = '2px';
+            tbContainer.style.left = '0px';
+            tbContainer.style.top = '50px';
+            tbContainer.style.width = '24px';
+            tbContainer.style.bottom = '0px';
+            delRow(tbContainer.id);
+            document.body.appendChild(tbContainer);
+
+            // 创建工具栏监听工具
+            var toolbar = new mxToolbar(tbContainer);
+            toolbar.enabled = false
+            //鸟瞰图
+            var outline = document.createElement('div');
+            outline.id = "outlineContainer";
+            outline.style = "position:absolute;overflow:hidden;top:36px;right:0px;width:200px;height:140px;background:transparent;border-style:solid;border-color:black;z-index:9999;";
+            delRow(outline.id);
+            document.body.appendChild(outline);
+            // 解决IE浏览器忽略的样式
+            if (mxClient.IS_QUIRKS) {
+                document.body.style.overflow = 'hidden';
+                new mxDivResizer(tbContainer);
+                new mxDivResizer(outline);
+            }
+            // 图形窗口的右上角的周围创建导航提示。
+            var outln = new mxOutline(graph, outline);
+            addToolbarItem(graph, toolbar, 'C', 'editors/images/CI1.png');
+            addToolbarItem(graph, toolbar, 'V', 'editors/images/VI.png');
+        }
+        //创建画板
+        function addWindow(title, wnd, content, x, y) {
+            wnd = new mxWindow(title, content, x, x, 1200, 800, null, true, true);
+            // 解决IE浏览器忽略的样式
+            if (mxClient.IS_QUIRKS) {
+                document.body.style.overflow = 'hidden';
+                new mxDivResizer(content);
+            }
+            //创建一个画板
+            var graph = new mxGraph(content);
+            // 禁用浏览器自带右键菜单
+            mxEvent.disableContextMenu(document.body);
+            // 去锯齿效果
+            mxRectangleShape.prototype.crisp = true;
+            // 创建下拉菜单
+            new mxRubberband(graph);
+            graph.setCellsResizable(true); //节点可改变大小
+            mxGraphHandler.prototype.setMoveEnabled(false); //是否可以移动
+            mxGraphHandler.prototype.guidesEnabled = false; //显示细胞位置标尺
+            graph.setEnabled(true);//是否允许编辑
+            graph.setCellsLocked(true);//是否可以移动连线，重新连接其他cell，主要用来展现中用
+            graph.setConnectable(false); // 是否允许Cells通过其中部的连接点新建连接,false则通过连接线连接
+            // 节点是否解析html
+            graph.setHtmlLabels(true);
+            // 开启提示
+            graph.setTooltips(true);
+            // 关闭方块上的文字编辑功能
+            graph.setCellsEditable(false);
+            //获取顶层，可以认为是父节点
+            new mxCellTracker(graph);
+            var parent = graph.getDefaultParent();
+            // 把定义好的样式object push到stylesheet
+            graph.getStylesheet().putCellStyle("style1", style);
+            /*禁用节点双击，防止改变数据 */
+            graph.dblClick = function (evt, cell) {
+                if (cell.vertex == true && cell.geometry.width > 0 && cell.geometry.height > 0) {
+                    mini.open({
+                        targetWindow: window,
+                        url: "SetUnitInfo.html",
+                        title: "装置信息设置", width: 600, height: 400,
+                        onload: function () {
+                        },
+                        ondestroy: function (action) {
+                            MatialIn(graph, cell);
+                            MatialOut(graph, cell);
+                        }
+                    });
+                }
+                if (cell.edge == true) {
+                    mini.open({
+                        targetWindow: window,
+                        url: "HtmlPage1.html",
+                        title: "物料跟踪图", width: 600, height: 600,
+                        onload: function () {
+                        },
+                        ondestroy: function (action) {
+                        }
+                    });
+                }
+            };
+            //单击监听事件
+            graph.addListener(mxEvent.CLICK, function (sender, evt) {
+                var e = evt.getProperty('event'); // mouse event
+                var cell = evt.getProperty('cell'); // cell may be null
+
+                if (cell != null) {
+                    evt.consume();
+                    $("#t1").val(cell.value);
+                    if (cell.edge == true) {
+                        var a = graph.getModel().getCell(2);
+                        graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, "#B43104", [a]);
+                    }
+                    else {
+                        var a = graph.getModel().getCell(2);
+                        graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, "#999999", [a]);
+                    }
+                }
+                else {
+                    $("#t1").val("");
+                    var a = graph.getModel().getCell(2);
+                    graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, "#999999", [a]);
+                }
+            });
+            //移动监听
+            graph.addListener(mxEvent.MOVE_CELLS, function (sender, evt) {
+                var e = evt.getProperty('event'); // mouse event
+                var cells = evt.getProperty('cells'); // cell may be null
+                if (cells != null) {
+                    evt.consume();
+                    for (var i = 0; i < cells.length; i++) {
+                        if (cells[i].edge != true && cells[i].geometry.width > 0 && cells[i].geometry.height > 0) {
+                            RefreshEdgeIn(graph, cells[i]);
+                            RefreshEdgeOut(graph, cells[i]);
+                        }
+                    }
+                }
+            });
+            //通过鼠标悬停事件禁止拖动线
+            graph.addMouseListener(
+            {
+                currentState: null,
+                previousStyle: null,
+                mouseDown: function (sender, me) {
+                },
+                mouseMove: function (sender, me) {
+                    if (this.currentState != null && me.getState() == this.currentState) {
+                        return;
+                    }
+
+                    var tmp = graph.view.getState(me.getCell());
+
+                    // Ignores everything but vertices
+                    if (graph.isMouseDown || (tmp != null && !
+                        graph.getModel().isVertex(tmp.cell))) {
+                        tmp = null;
+                    }
+
+                    if (tmp != this.currentState) {
+                        if (this.currentState != null) {
+                            this.dragLeave(me.getEvent(), this.currentState);
+                        }
+
+                        this.currentState = tmp;
+
+                        if (this.currentState != null) {
+                            this.dragEnter(me.getEvent(), this.currentState);
+                        }
+                    }
+                },
+                mouseUp: function (sender, me) { },
+                dragEnter: function (evt, state) {
+                    mxGraphHandler.prototype.setMoveEnabled(true);
+                    graph.setCellsLocked(false);
+                },
+                dragLeave: function (evt, state) {
+                    mxGraphHandler.prototype.setMoveEnabled(false);
+                    graph.setCellsLocked(true);
+                }
+            });
+            //调整改变大小监听
+            graph.addListener(mxEvent.CELLS_RESIZED, function (sender, evt) {
+                /*重新绘制进出料位置*/
+                var cells = evt.getProperty('cells');
+                if (cells != null) {
+                    for (var i = 0; i < cells.length; i++) {
+                        /*修改样式*/
+                        RefreshEdgeIn(graph, cells[i]);
+                        RefreshEdgeOut(graph, cells[i]);
+                        graph.setCellStyles(mxConstants.STYLE_IMAGE_WIDTH, cells[i].geometry.width, [cells[i]]);
+                        graph.setCellStyles(mxConstants.STYLE_IMAGE_HEIGHT, cells[i].geometry.height, [cells[i]]);
+                        if (graph.getModel().getChildCount(cells[i]) > 0) {
+                            var geo = graph.getCellGeometry(cells[i]);
+
+                            if (geo != null) {
+                                var children = graph.getChildCells(cells[i], true, true);
+                                var bounds = graph.getBoundingBoxFromGeometry(children, true);
+
+                                geo = geo.clone();
+                                geo.width = Math.max(geo.width, bounds.width);
+                                geo.height = Math.max(geo.height, bounds.height);
+
+                                graph.getModel().setGeometry(cells[i], geo);
+                            }
+                        }
+                    }
+                }
+            });
+            // 覆写右键单击事件
+            graph.popupMenuHandler.factoryMethod = function (menu, cell, evt) {
+                createPopupMenu(graph, menu, cell, evt);
+            };
+            //‘撤销’监听
+            var undoMng = new mxUndoManager();
+            var listener = function (sender, evt) {
+                undoMng.undoableEditHappened(evt.getProperty('edit'));
+            };
+            graph.getModel().addListener(mxEvent.UNDO, listener);
+            graph.getView().addListener(mxEvent.UNDO, listener);
+            // 设置自动扩大鼠标悬停
+            graph.panningHandler.autoExpand = true;
+            // 居中缩放
+            graph.centerZoom = true;
+            wnd.setMaximizable(true);
+            wnd.setScrollable(true);
+            wnd.setResizable(true);
+            wnd.setVisible(true);
+            wnd.addListener(mxEvent.ACTIVATE, function (e) {
+                RefreshButton(graph);
+            });
+            return { wnd: wnd, graph: graph };
+        }
+        //删除标签
+        function delRow(id) {
+            var ele = document.getElementById(id);    //删除与增加一样，同样要找到父级标签
+            if (ele != null) {
+                ele.parentNode.removeChild(ele);
+            }
+        }
+        //模型图选择器
+        function moldelWindowSelect(objGraph) {
+            var lct = document.getElementById("lct");
+            lct.innerHTML = "";
+
+            for (var i = 0; i < lct.childNodes.length; i++) {
+                lct.removeChild(lct.options[0]);
+                lct.remove(0);
+                lct.options[0] = null;
+            }      
+            for (var i = 0; i < objGraph.length; i++) {
+                lct.options[i] = new Option(objGraph[i].wnd.title.innerText, objGraph[i].wnd.title.innerText);
+                objGraph[i].wnd.setVisible(false);                
+            }
+            objGraph[objGraph.length - 1].wnd.setVisible(true);
+            lct.options[objGraph.length - 1].selected = true;
+            lct.onchange = function () {
+                for (var i = 0; i < objGraph.length; i++) {
+                    if (lct.value == objGraph[i].wnd.title.innerText) {
+                        objGraph[i].wnd.setVisible(true);
+                    }
+                    else {
+                        objGraph[i].wnd.setVisible(false);
+                    }
+
+                }
+            }
+            //delRow(lct.id);
+            //document.body.appendChild(lct);
+        }
     </script>
 </head>
 
 <!-- 页面传递图形的容器给程序 -->
 <body>
-    <!--值: <input id="t1" type="text" />-->
     <!-- 创建一个带有网格背景图的容器 -->
     <div id="main">  </div>
-    <!-- 创建导航框-->
-    <div id="outlineContainer"
-         style="position:absolute;overflow:hidden;top:36px;right:0px;width:200px;height:140px;background:transparent;border-style:solid;border-color:black;">
-    </div>
 </body>
 </html>
