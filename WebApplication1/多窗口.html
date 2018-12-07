@@ -124,7 +124,6 @@
             lctName.id = "lctName";
             lctName.value = "模型图";
             document.body.appendChild(lctName);
-            objGraph.push(addWindow(document.getElementById("lctName").value, wnd, container, x, y));
             document.body.appendChild(mxUtils.button('新建流程图', function () {
                 for (var i = 0; i < objGraph.length; i++) {
                     if (objGraph[i].wnd.title.innerText == document.getElementById("lctName").value) {
@@ -146,6 +145,8 @@
             var lct = document.createElement("select");
             lct.id = "lct";
             document.body.appendChild(lct);
+            objGraph.push(addWindow(document.getElementById("lctName").value, wnd, container, x, y));
+        
             moldelWindowSelect(objGraph);
             RefreshButton(objGraph[0].graph, toolbar);
         }
