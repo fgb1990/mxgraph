@@ -132,7 +132,7 @@
                 new mxDivResizer(outline);
             }
 
-            /************END侧边栏****************/         
+            /************END侧边栏****************/
             //创建一个画板
             var graph = new mxGraph(container);
             // 禁用浏览器自带右键菜单
@@ -173,14 +173,14 @@
                         }
                     });
                 }
-                if (cell.edge == true ) {
+                if (cell.edge == true) {
                     mini.open({
                         targetWindow: window,
                         url: "HtmlPage1.html",
                         title: "物料跟踪图", width: 600, height: 600,
                         onload: function () {
                         },
-                        ondestroy: function (action) {                         
+                        ondestroy: function (action) {
                         }
                     });
                 }
@@ -191,7 +191,7 @@
                 var cell = evt.getProperty('cell'); // cell may be null
 
                 if (cell != null) {
-                    evt.consume();                    
+                    evt.consume();
                     $("#t1").val(cell.value);
                     if (cell.edge == true) {
                         var a = graph.getModel().getCell(2);
@@ -219,7 +219,7 @@
                             RefreshEdgeIn(graph, cells[i]);
                             RefreshEdgeOut(graph, cells[i]);
                         }
-                    }                   
+                    }
                 }
             });
             //通过鼠标悬停事件禁止拖动线
@@ -319,7 +319,7 @@
                 }
                 var cell = graph.getSelectionCells()[0];
                 SubmitData(graph, cell);
-            }));  
+            }));
             document.body.appendChild(mxUtils.button('导入', function (evt) {
                 Import(graph);
             }));
@@ -406,7 +406,11 @@
             document.body.appendChild(mxUtils.button('View XML', function () {
                 var encoder = new mxCodec();
                 var node = encoder.encode(graph.getModel());
-                mxUtils.popup(mxUtils.getPrettyXml(node), true);   //以窗口的方式展示处理
+                var str = mxUtils.getPrettyXml(node)      
+                mxUtils.popup(str, true);   //以窗口的方式展示处理
+                //var s = getXmlNode(str);
+                //var obj = eval('(' + s + ')');
+                //console.log(obj);
             }));
             document.body.appendChild(mxUtils.button('计算', function () {
                 var message = "计算完成";
@@ -441,7 +445,7 @@
             }));
             /***********左侧装置栏************/
             addToolbarItem(graph, toolbar, 'C', 'editors/images/CI1.png');
-            addToolbarItem(graph, toolbar, 'V', 'editors/images/VI.png');       
+            addToolbarItem(graph, toolbar, 'V', 'editors/images/VI.png');
             // 图形窗口的右上角的周围创建导航提示。
             var outln = new mxOutline(graph, outline);
 
@@ -555,7 +559,7 @@
         }
         // Function to create the entries in the popupmenu
         function createPopupMenu(graph, menu, cell, evt) {
-            //console.log(evt.offsetX + "-" + evt.offsetY);
+            ////console.log(evt.offsetX + "-" + evt.offsetY);
             if (cell != null) {
                 menu.addItem('添加进料', null, function () {
                     if (graph.getSelectionCells().length != 1) {
@@ -611,12 +615,12 @@
             // 创建拖动预览图标
             var img = toolbar.addMode(null, image, funct);
             mxUtils.makeDraggable(img, graph, funct);
-        }
+        }       
     </script>
 </head>
 
 <!-- 页面传递图形的容器给程序 -->
-<body> 
+<body>
     <!--值: <input id="t1" type="text" />-->
     <!-- 创建一个带有网格背景图的容器 -->
     <div id="main">  </div>

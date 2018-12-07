@@ -98,9 +98,9 @@
         window.onload = function () {
             var container = document.getElementById("main");
             container.style.position = 'absolute';
-            container.style.overflow = 'hidden';
+            //container.style.overflow = 'hidden';
             container.style.left = '24px';
-            container.style.top = '36px';
+            container.style.top = '5px';
             container.style.right = '0px';
             container.style.bottom = '0px';
             container.style.background = 'url("editors/images/grid.gif")';
@@ -111,19 +111,13 @@
                 new mxDivResizer(container);
             }
             var wnd;
-            var x = 50;
-            var y = 50;
+            var x = 35;
+            var y = 35;
             var objGraph = new Array();
 
             document.body.appendChild(mxUtils.button('计算', function () {
                 var message = "计算完成";
                 mxUtils.popup(message, true);   //以窗口的方式展示处理
-            }));
-            document.body.appendChild(mxUtils.button('显示', function () {
-                objGraph[0].wnd.setVisible(true);
-            }));
-            document.body.appendChild(mxUtils.button('隐藏', function () {
-                objGraph[0].wnd.setVisible(false);
             }));
             var lctName = document.createElement("input");
             lctName.type = "text";
@@ -139,6 +133,12 @@
                     }
                 }
                 var content = document.createElement('div');
+                content.style.position = 'absolute';
+                content.style.overflow = 'auto';
+                content.style.left = '24px';
+                content.style.top = '5px';
+                content.style.right = '0px';
+                content.style.bottom = '0px';
                 objGraph.push(addWindow(document.getElementById("lctName").value, wnd, content, x, y));
                 moldelWindowSelect(objGraph);
 
@@ -148,6 +148,9 @@
             document.body.appendChild(lct);
             moldelWindowSelect(objGraph);
             RefreshButton(objGraph[0].graph, toolbar);
+        }
+        window.onresize = function () {
+
         }
         function MatialIn(graph, cell) {
             var parent = graph.getDefaultParent();
@@ -258,7 +261,7 @@
         }
         // Function to create the entries in the popupmenu
         function createPopupMenu(graph, menu, cell, evt) {
-            //console.log(evt.offsetX + "-" + evt.offsetY);
+            ////console.log(evt.offsetX + "-" + evt.offsetY);
             if (cell != null) {
                 menu.addItem('添加进料', null, function () {
                     if (graph.getSelectionCells().length != 1) {
@@ -504,11 +507,13 @@
             var toolbar = new mxToolbar(tbContainer);
             toolbar.enabled = false
             //鸟瞰图
-            var outline = document.createElement('div');
-            outline.id = "outlineContainer";
-            outline.style = "position:absolute;overflow:hidden;top:36px;right:0px;width:200px;height:140px;background:transparent;border-style:solid;border-color:black;z-index:9999;";
-            delRow(outline.id);
-            document.body.appendChild(outline);
+            //var outline = document.createElement('div');
+            //outline.id = "outlineContainer";
+            //outline.style = "position:absolute;overflow:hidden;top:36px;right:0px;width:200px;height:140px;background:transparent;border-style:solid;border-color:black;z-index:9999;";
+            //delRow(outline.id);
+            //document.body.appendChild(outline);
+            var outline = document.getElementById("outlineContainer");
+            outline.innerHTML = "";
             // 解决IE浏览器忽略的样式
             if (mxClient.IS_QUIRKS) {
                 document.body.style.overflow = 'hidden';
@@ -521,8 +526,8 @@
             addToolbarItem(graph, toolbar, 'V', 'editors/images/VI.png');
         }
         //创建画板
-        function addWindow(title, wnd, content, x, y) {
-            wnd = new mxWindow(title, content, x, x, 1200, 800, null, true, true);
+        function addWindow(title, wnd, content, x, y) { 
+            wnd = new mxWindow(title, content, x, x, document.documentElement.clientWidth - 250, document.documentElement.clientHeight - 50, false, false, true);
             // 解决IE浏览器忽略的样式
             if (mxClient.IS_QUIRKS) {
                 document.body.style.overflow = 'hidden';
@@ -709,6 +714,7 @@
             wnd.addListener(mxEvent.ACTIVATE, function (e) {
                 RefreshButton(graph);
             });
+            RefreshButton(graph);
             return { wnd: wnd, graph: graph };
         }
         //删除标签
@@ -727,17 +733,18 @@
                 lct.removeChild(lct.options[0]);
                 lct.remove(0);
                 lct.options[0] = null;
-            }      
+            }
             for (var i = 0; i < objGraph.length; i++) {
                 lct.options[i] = new Option(objGraph[i].wnd.title.innerText, objGraph[i].wnd.title.innerText);
-                objGraph[i].wnd.setVisible(false);                
+                objGraph[i].wnd.setVisible(false);
             }
             objGraph[objGraph.length - 1].wnd.setVisible(true);
             lct.options[objGraph.length - 1].selected = true;
             lct.onchange = function () {
                 for (var i = 0; i < objGraph.length; i++) {
                     if (lct.value == objGraph[i].wnd.title.innerText) {
-                        objGraph[i].wnd.setVisible(true);
+                        objGraph[i].wnd.setVisible(true); 
+                        objGraph[i].wnd.setSize(document.documentElement.clientWidth - 250, document.documentElement.clientHeight - 50);
                     }
                     else {
                         objGraph[i].wnd.setVisible(false);
@@ -745,8 +752,6 @@
 
                 }
             }
-            //delRow(lct.id);
-            //document.body.appendChild(lct);
         }
     </script>
 </head>
@@ -755,5 +760,6 @@
 <body>
     <!-- 创建一个带有网格背景图的容器 -->
     <div id="main">  </div>
+    <div id="outlineContainer" style="position: absolute; overflow: hidden; top: 36px; right: 0px; width: 200px; height: 140px; background: transparent; border-style: solid; border-color: black; z-index: 9999;"></div>
 </body>
 </html>
