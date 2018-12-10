@@ -1,1 +1,1 @@
-﻿mxBasePath = '../src';
+﻿mxBasePath = 'src';
